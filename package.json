@@ -1,0 +1,33 @@
+{
+  "name": "sisespecialista",
+  "version": "1.0.0",
+  "description": "Sistema Especialista",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+	 "test": "echo \"Error: no test specified\" && exit 1",
+	 "rebuild": "electron-rebuild -f -w sqlite3"
+  },
+  "author": "Ledski",
+  "license": "ISC",
+  "devDependencies": {
+	 "electron": "^4.1.1",
+	 "electron-rebuild": "^1.8.4"
+  },
+  "dependencies": {
+    "sqlite3": "^4.0.6"
+  },
+  "//": {
+    "scripts": {
+      "rebuild": "electron-rebuild -f -w sqlite3 -p",
+      "postinstall": "electron-builder install-app-deps"
+    },
+    "devDependencies": {
+      "electron-builder": "^20.39.0",
+      "electron-rebuild": "^1.8.4"
+    },
+    "dependencies": {
+      "sqlite3": "^4.0.6"
+    }
+  }
+}

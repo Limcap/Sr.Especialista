@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+	<link rel="stylesheet" type="text/css" href="basic.css">
+	<title>Sr.Especialista</title>
+</head>
+
+
+
+<body>
+	<div class="spaced-area">
+		<h3>Perfil: <span id="txtUsuario">Usuario</span></h3>
+		<button id="btSair" class="btSair">Sair do perfil</button>	
+	</div>
+	
+	<hr>
+	
+	<div class="spaced-area">
+		<h3>Selecione uma especialidade</h3>
+		<br>
+		<select id="slcSistemas" size=10 style="width:100%"></select>
+		<button id="btOk">Ok</button>
+	</div>
+	
+	<div class="spaced-area">
+		<a href="#" id="btAdicionar">Criar uma nova especialidade</a>
+	</div>>
+	
+	<div id="divMensagem"></div>
+</body>
+
+
+
+<script>
+// ---------- Imports
+const { remote } = require('electron')
+const dal = remote.require('./data-access-layer.js')
+const thisWin = remote.getCurrentWindow()
+
+
+// ---------- Elementos do DOM
+const slcSistemas = document.getElementById("slcSistemas")
+const btSair = document.getElementById("btSair")
+const btOk = document.getElementById("btOk")
+
+
+// ---------- Eventos
+btSair.addEventListener('click',sair)
+btOk.addEventListener('click',clickBtOk)
+
+
+// ---------- Inicialização
+txtUsuario.innerHTML = dal.getPerfilAtivo().nome
+preencher()
+
+
+// ---------- Funções
+
+function preencher() {
+	//console.log(dal.perfilAtivo)
+	dal.getSistemas()
+	.then(rows => {
+		rows.forEach(row => {
+			opt = document.createElement("option")
+			opt.text = row.nome
+			opt.value = row.id
+			opt.obj = row
+			slcSistemas.options.add(opt)
+		});
+	})
+}
+
+
+function sair(){
+	thisWin.loadFile('login.html')
+}
+
+
+function clickBtOk() {
+	if(slcSistemas.value) {
+		dal.setSistemaAtivo(slcSistemas.options[slcSistemas.value-1].obj)
+		thisWin.loadFile('./sysMain.html')
+	}
+}
+
+
+</script>
