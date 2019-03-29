@@ -28,15 +28,16 @@
 			<input id="inpPergunta" class="input73L"/>
 			<input id="inpValor" class="input73R"/>
 		</div>
-		<button id="btSalvarPergunta">Salvar fato</button>
-		<button id="btApagarPergunta">Excluir fato</button>
+		<button id="btSalvarPergunta">&#10004;</button>
+		<button id="btApagarPergunta">&#10008;</button>
 	</div>
 
 	<div class="card">
-		<h3>Resultados</h3>
-		<select id="slcRegras" size=5 class="input100"></select>
-		<button>Adicionar Regra</button>
-		<button>Excluir Regra</button>
+			<h3>Resultados</h3>
+			<select id="slcResultado" class="input100" size=5></select>
+			<input id="inpResultado" class="input100"/>
+			<button id="btSalvarResultado">&#10004;</button>
+			<button id="btApagarResultado">&#10008;</button>
 	</div>
 
 	<div class="card">
@@ -46,7 +47,6 @@
 		<button>Excluir Regra</button>
 	</div>
 </body>
-
 
 
 
@@ -72,7 +72,12 @@ const slcConclusoes = document.getElementById("slcConclusoes")
 const slcRegras = document.getElementById("slcRegras")
 
 
-// ---------- Init
+// ---------- INICIALIZAÇOES
+usuarioNome = dal.getPerfilAtivo().nome
+sistemaNome = dal.getSistemaAtivo().nome
+sistemaId = dal.getSistemaAtivo().id
+sistemDesc = dal.getSistemaAtivo().descricao
+
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
@@ -82,25 +87,45 @@ inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
 btFinalizar.addEventListener('click',clickBtFinalizar)
 
 // ---------- Inicialização do componente Perguntas
-
-
 let ctrlPerguntas = new controllerSelectEdit()
 dal.fetchAllFatos().then(perguntas => {
 	ctrlPerguntas.model.dataArray = perguntas
 	ctrlPerguntas.model.textColumn = "fato"
-	ctrlPerguntas.model.valueColumn = null
+	ctrlPerguntas.model.valueColumn = "id"
+	ctrlPerguntas.model.pkColumn = 'id'
 	
 	ctrlPerguntas.view.selectBox = document.getElementById("slcPergunta"),
 	ctrlPerguntas.view.inputField = document.getElementById('inpPergunta'),
 	ctrlPerguntas.view.buttonSave = document.getElementById('btSalvarPergunta'),
 	ctrlPerguntas.view.buttonDel = document.getElementById('btApagarPergunta')
 
-	ctrlPerguntas.logic.saveFunction = null
-	ctrlPerguntas.logic.delFunction = null
+	ctrlPerguntas.logic.dataObjSaveFunc = dal.saveDataObj
+	ctrlPerguntas.logic.dataObjDelFunc = dal.delDataObj
+	ctrlPerguntas.logic.dataObjFactory = function() { return {sistema_fk:dal.getSistemaAtivo().id, fato:null} }
+	ctrlPerguntas.logic.dbTableName = "fatos"
 
 	ctrlPerguntas.render()
 })
 
+// ---------- Inicialização do componente Resultados
+let ctrlResultados = new controllerSelectEdit()
+dal.fetchAllFatos().then(resultados => {
+	ctrlResultados.model.dataArray = resultados
+	ctrlResultados.model.textColumn = "fato"
+	ctrlResultados.model.valueColumn = null
+	
+	ctrlResultados.view.selectBox = document.getElementById("slcResultado"),
+	ctrlResultados.view.inputField = document.getElementById('inpResultado'),
+	ctrlResultados.view.buttonSave = document.getElementById('btSalvarResultado'),
+	ctrlResultados.view.buttonDel = document.getElementById('btApagarResultado')
+
+	ctrlResultados.logic.saveFunction = null
+	ctrlResultados.logic.delFunction = null
+
+	ctrlResultados.render()
+})
+
+// ---------
 function clickBtFinalizar(){
 	thisWin.loadFile('./sysMain.html')
 }

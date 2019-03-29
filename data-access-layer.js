@@ -133,3 +133,90 @@ exports.fetchAllFatos = function() {
 		})
 	})
 }
+
+
+exports.oldsaveDataObj = function( table, dataObj ) {
+	console.log(dataObj)
+	if( !dataObj.id) {
+		return new Promise((resolve, reject) => {
+			let columns = Object.keys(dataObj).join(',')
+			let values = Object.values(dataObj).join('","')
+			
+			let qry = `INSERT INTO ${table} (${columns}) VALUES ("${values}")`
+			console.log(qry)
+			db.run(qry, [], function(err, res) {
+				if (err) reject (err)
+				else {
+					console.log("last id = " + this.lastID)
+					db.get(`SELECT * FROM ${table} WHERE rowid = ${this.lastID}`, [], (err, row) => {
+						console.log(row)
+						if(err) reject(err)
+						else resolve (row)
+					})
+				}
+			})
+		})
+	}
+	else {
+		let pairs = Object.entries(dataObj)
+		pairs = pairs.map(x => x[0]+'="'+x[1]+'"').join(',')
+		let qry = `UPDATE ${table} SET ${pairs} WHERE ${pkColumn} = ${dataObj.id}`
+	}
+}
+
+exports.saveDataObj = async function( dataObj, tableName, pkColumn ) {
+	isInsert = dataObj.hasOwnProperty( pkColumn )
+	let rowid
+	if( isInsert ) {
+		rowid = await updateDataObj( dataObj, tableName, pkColumn )
+	} else {
+		rowid = await insertDataObj( dataObj, tableName )
+	}
+/*
+	rowid = isInsert ?
+		await insertDataObj( dataObj, tableName ) :
+		await updateDataObj( dataObj, tableName, pkColumn )
+*/
+	let row
+	row = await getDataObjByRowId( tableName, rowid )
+	return row
+}
+
+let getDataObjByRowId = function( tableName, rowid ) {
+	return new Promise(( resolve, reject ) => {
+		let qry = `SELECT * FROM ${tableName} WHERE rowid = ?`
+		db.get( qry, [rowid], (err, row) => {
+			if( err ) throw( err )
+			else resolve( row )
+		})
+	})
+}
+
+let insertDataObj = function( dataObj, tableName ) {
+	return new Promise(( resolve, reject )=>{
+		let columns = Object.keys( dataObj ).join( ',' )
+		let values = Object.values( dataObj ).join( '","' )
+		let qry = `INSERT INTO ${tableName} (${columns}) VALUES ("${values}")`
+		db.run(qry, [], function( err ) {
+			if( err ) throw( err )
+			else resolve( this.lastID )
+		})
+	})
+}
+
+let updateDataObj = function( dataObj, tableName, pkColumn ) {
+	return new Promise(( resolve, reject ) => {
+		let pairs = Object.entries( dataObj )
+		pairs = pairs.filter(x => x[0] != pkColumn).map( x => x[0]+' = "'+x[1]+'"' ).join( ',' )
+		let pkValue = dataObj[pkColumn]
+		let qry = `UPDATE ${tableName} SET ${pairs} WHERE ${pkColumn} = ${pkValue}`
+		db.run(qry, [], function( err ) {
+			if( err ) throw( err )
+			else resolve( pkValue )
+		})
+	})
+}
+
+exports.delSaveObj = function( table, dataObj ) {
+
+}

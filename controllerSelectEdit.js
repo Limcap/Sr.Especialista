@@ -8,31 +8,28 @@ let ControllerSelectEdit = function() {
 	this.model = {
 		dataArray: null,
 		textColumn: null,
-		valueColumn: null
+		valueColumn: null,
+		pkColumn: null
 	}
 	this.logic = {
-		saveFunction: null,
-		delFunction: null
+		dataObjSaveFunc: null,
+		dataObjdelFunc: null,
+		dataObjFactory: null,
+		dbTableName: null
 	}
-	/*
-	this.dataArray = null
-	this.selectBox = null
-	this.inputField = null
-	this.buttonSave = null
-	this.buttonDel = null
-	this.saveFunction = null
-	this.delFunction = null
-	this.textPropertyName = null
-	this.valuePropertyName = null
-	*/
 }
 
 ControllerSelectEdit.prototype.render = function() {
 	let dt = this.model.dataArray
 	let tc = this.model.textColumn
 	let vc = this.model.valueColumn
+	let pk = this.model.pkColumn
 	let sb = this.view.selectBox
 	let ip = this.view.inputField
+	let sf = this.logic.dataObjSaveFunc
+	let df = this.logic.dataObjdelFunc
+	let fc = this.logic.dataObjFactory
+	let tb = this.logic.dbTableName
 
 	if( !dt || !sb || !ip ) {
 		return false
@@ -60,7 +57,7 @@ ControllerSelectEdit.prototype.render = function() {
 	}
 
 	function insertAddOpt(focus) {
-		let addOpt = newOption( "+", "-1", null, clickOpt )
+		let addOpt = newOption( "+", null, null, clickOpt )
 		sb.options.add( addOpt )
 		if( focus ) {
 			sb.selectedIndex = sb.length-1
@@ -73,16 +70,26 @@ ControllerSelectEdit.prototype.render = function() {
 		ip.value = opt.obj ? opt.text : ""
 		ip.selectedOpt = opt
 		ip.focus()
+		console.log(opt)
+		console.log(opt.obj)
 	}
 
-	function clickBtSave() {
+	async function clickBtSave() {
 		if( ip.value.trim().length > 0 ) {
 			selected = sb.options.item( sb.selectedIndex )
 			selected.text = ip.value
-			if( !selected.obj ) {
-				selected.obj = {fato:ip.value, sistema_fk:1}
+			let modeInsert = !selected.obj
+			let obj = modeInsert ? fc() : selected.obj
+			obj[tc] = ip.value
+			if( typeof sf === "function" ) {
+				obj = await sf( obj, tb, pk )
+			}
+			console.log(obj)
+			selected.obj = obj
+			if( modeInsert ) { 
 				insertAddOpt( true )
 			}
+			
 		}
 	}
 
