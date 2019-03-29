@@ -10,7 +10,6 @@ body {
 }
 
 h3 {
-/*	background-color: lightskyblue; */
 	margin: 0;
 }
 
@@ -18,11 +17,7 @@ p {
 	margin: 0;
 }
 
-hr {
-	display: none;
-}
-
-.spaced-area {
+.card {
 	margin: 1em;
 	background-color: rgba(255,255,255,0.9);
 	padding: 1em;
@@ -30,21 +25,26 @@ hr {
 	border-radius: 3px;
 }
 
-.spaced-area > button {
-	margin-top: 1em;
-}
-
-.btSair {
-	/*float: right;*/
-	display: block;
-	
+.card textarea,
+.card input,
+.card select {
+	margin-bottom: 1em;
 }
 
 .input73L {
-	width:69%;
+	width: 69%;
 }
 
 .input73R {
-	width:28%;
+	width: 28%;
 	float: right;
+}
+
+.input100 {
+	width: 100%;
+}
+
+textarea.input100 {
+	resize: none;
+	overflow-y: scroll;
 }

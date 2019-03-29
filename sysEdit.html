@@ -7,23 +7,23 @@
 
 
 <body>
-	<div class="spaced-area">
-		<h3>Perfil: <span id="txtUsuario">Usuario</span></h3>
-		<h3>Especialidade: <span id="txtSistema">Sistema</span></h3>
-		<button id="btFinalizar" class="btFinalizar">Finalizar edição</button>
+	<div class="card">
+		<h3>Perfil: <span id="txtUsuario">--</span></h3>
+		<h3>Especialidade: <span id="txtSistema">--</span></h3>
+		<br>
+		<button id="btFinalizar">Finalizar edição</button>
 	</div>
-	<hr>
-	<div class="spaced-area edit">
+	
+	<div class="card">
 		<h3>Descrição</h3>
-		<textarea id="inpDescricao" size=2 style="width:99%; resize:none; overflow-y: scroll"></textarea>
+		<textarea id="inpDescricao" size=2 class="input100"></textarea>
 		<button id="btSalvarDesc">Salvar descrição</button>
 	</div>
-	<hr>
-	<div class="spaced-area">
+
+	<div class="card">
 		<h3>Perguntas</h3>
 		<select id="slcPergunta" size=5 class="input73L"></select>
 		<select id="slcValores" size=5 class="input73R"></select>
-		
 		<div>
 			<input id="inpPergunta" class="input73L"/>
 			<input id="inpValor" class="input73R"/>
@@ -31,15 +31,15 @@
 		<button id="btSalvarPergunta">Salvar fato</button>
 		<button id="btApagarPergunta">Excluir fato</button>
 	</div>
-	<hr>
-	<div class="spaced-area">
+
+	<div class="card">
 		<h3>Resultados</h3>
-		<select id="slcRegras" size=5 style="width:100%;"></select>
+		<select id="slcRegras" size=5 class="input100"></select>
 		<button>Adicionar Regra</button>
 		<button>Excluir Regra</button>
 	</div>
-	<hr>
-	<div class="spaced-area">
+
+	<div class="card">
 		<h3>Condições</h3>
 		<select id="slcRegras" size=5 style="width:100%;"></select>
 		<button>Adicionar Regra</button>
