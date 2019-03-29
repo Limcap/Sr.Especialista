@@ -1,0 +1,69 @@
+let data
+let vwSelect
+let vwInput
+let btSave
+let btDel
+
+function setup (dataArray, viewSelect, viewInput, buttonSave, buttonDel) {
+	this.data = dataArray
+	this.vwSelect = viewSelect
+	this.vwInput = viewInput
+	this.btSave = buttonSave
+	this.btDel = buttonDel
+
+	this.btSave.addEventListener('click',clickBtSave)
+	this.btDel.addEventListener('click',clickBtDel)
+
+	render()
+}
+
+function render() {
+	this.vwSelect.innerHTML=""
+	for(let i = 0; i < data.length; i++) {
+		let opt = newOption(data[i].fato, i, data[i], clickOpt)
+		this.vwSelect.options.add(opt)
+	}
+	insertAddOpt()
+}
+
+function newOption(text,value,obj,onclick) {
+	opt = document.createElement("option")
+	opt.text = text
+	opt.value = value
+	opt.obj = obj
+	opt.addEventListener('click',onclick)
+	return opt
+}
+
+function insertAddOpt(focus) {
+	let addOpt = newOption("+", "-1", null, clickOpt)
+	vwSelect.options.add( addOpt )
+	if(focus) {
+		vwSelect.selectedIndex = vwSelect.length-1
+		clickOpt({target:addOpt})
+	}
+}
+
+function clickOpt(ev) {
+	let opt = ev.target
+	vwInput.value = opt.obj ? opt.text : ""
+	vwInput.selectedOpt = opt
+	vwInput.focus()
+}
+
+function clickBtSave() {
+	if( vwInput.value.trim().length > 0 ) {
+		selected = vwSelect.options.item( vwSelect.selectedIndex )
+		selected.text = vwInput.value
+		if(!selected.obj) {
+			selected.obj = {fato:vwInput.value, sistema_fk:1}
+			insertAddOpt(true)
+		}
+	}
+}
+
+function clickBtDel() {
+	selected = vwSelect.options.item( vwSelect.selectedIndex )
+	if(selected.obj)
+		vwSelect.remove( vwSelect.selectedIndex )
+}
