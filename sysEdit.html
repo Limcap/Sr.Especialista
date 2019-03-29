@@ -21,15 +21,15 @@
 	<hr>
 	<div class="spaced-area">
 		<h3>Perguntas</h3>
-		<select id="slcFatos" size=5 class="input73L"></select>
+		<select id="slcPergunta" size=5 class="input73L"></select>
 		<select id="slcValores" size=5 class="input73R"></select>
 		
 		<div>
-			<input id="inpFato" class="input73L"/>
+			<input id="inpPergunta" class="input73L"/>
 			<input id="inpValor" class="input73R"/>
 		</div>
-		<button id="btSalvarFato">Salvar fato</button>
-		<button id="btExcluirFato">Excluir fato</button>
+		<button id="btSalvarPergunta">Salvar fato</button>
+		<button id="btApagarPergunta">Excluir fato</button>
 	</div>
 	<hr>
 	<div class="spaced-area">
@@ -54,6 +54,7 @@
 // ---------- Imports
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
+const controllerSelectEdit = require('./controllerSelectEdit.js')
 const thisWin = remote.getCurrentWindow()
 
 
@@ -61,11 +62,11 @@ const thisWin = remote.getCurrentWindow()
 const txtUsuario = document.getElementById("txtUsuario")
 const txtSistema = document.getElementById("txtSistema")
 const btFinalizar = document.getElementById('btFinalizar')
+
 const inpDescricao = document.getElementById("inpDescricao")
 const btSalvarDesc = document.getElementById("btSalvarDesc")
-const slcFatos = document.getElementById("slcFatos")
-const inpFato = document.getElementById('inpFato')
-const btSalvarFato = document.getElementById('btSalvarFato')
+
+
 const slcValores = document.getElementById("slcValores")
 const slcConclusoes = document.getElementById("slcConclusoes")
 const slcRegras = document.getElementById("slcRegras")
@@ -75,59 +76,33 @@ const slcRegras = document.getElementById("slcRegras")
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
-preencherFatos()
 
 
 // ---------- Events
 btFinalizar.addEventListener('click',clickBtFinalizar)
-btSalvarFato.addEventListener('click',clickBtSalvarFato)
+
+// ---------- Inicialização do componente Perguntas
 
 
-// ---------- Funções de init
-function preencherFatos() {
-	dal.fetchAllFatos()
-	.then(rows => {
-		let i = 0
-		rows.forEach(row => {
-			let opt = newOption(row.fato, i, row, "clickOptFatos(this)")
-			slcFatos.options.add(opt)
-			i++
-		});
-		slcFatos.options.add( newOption("+ Novo Fato","-1",null,"clickOptFatos(this)"))
-	})
-}
+let ctrlPerguntas = new controllerSelectEdit()
+dal.fetchAllFatos().then(perguntas => {
+	ctrlPerguntas.model.dataArray = perguntas
+	ctrlPerguntas.model.textColumn = "fato"
+	ctrlPerguntas.model.valueColumn = null
+	
+	ctrlPerguntas.view.selectBox = document.getElementById("slcPergunta"),
+	ctrlPerguntas.view.inputField = document.getElementById('inpPergunta'),
+	ctrlPerguntas.view.buttonSave = document.getElementById('btSalvarPergunta'),
+	ctrlPerguntas.view.buttonDel = document.getElementById('btApagarPergunta')
 
-function newOption(text,value,obj,onclick) {
-	opt = document.createElement("option")
-	opt.text = text
-	opt.value = value
-	opt.obj = obj
-	opt.setAttribute("onclick",onclick)
-	return opt
-}
+	ctrlPerguntas.logic.saveFunction = null
+	ctrlPerguntas.logic.delFunction = null
 
-// ---------- Funções de Eventos
+	ctrlPerguntas.render()
+})
+
 function clickBtFinalizar(){
 	thisWin.loadFile('./sysMain.html')
 }
-
-function clickOptFatos(opt) {
-	inpFato.value = opt.obj ? opt.text : ""
-	inpFato.opt = opt
-	inpFato.focus()
-}
-
-function clickBtSalvarFato() {
-	if(inpFato.opt.obj) {
-		inpFato.opt.text = inpFato.value
-	} else {
-		let opt = newOption(inpFato.value,"",{},"clickOptFatos(this)")
-		slcFatos.options.add( opt )
-		inpFato.opt = opt
-	}
-}
-
-
-
 </script>
 </html>
