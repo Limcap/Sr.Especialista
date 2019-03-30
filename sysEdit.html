@@ -52,8 +52,10 @@
 
 <script>
 // ---------- Imports
+const menu = require('./menu.js')
 const { remote } = require('electron')
-const dal = remote.require('./data-access-layer.js')
+var dal = remote.require('./data-access-layer.js')
+console.log(dal)
 const controllerSelectEdit = require('./controllerSelectEdit.js')
 const thisWin = remote.getCurrentWindow()
 

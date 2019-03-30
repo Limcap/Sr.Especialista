@@ -12,13 +12,12 @@ let sysAtivo
 exports.getPerfilAtivo = function() {
 	return perfilAtivo
 }
-
-
+exports.setPerfilAtivo = function(p) {
+	perfilAtivo = p
+}
 exports.setSistemaAtivo = function(obj) {
 	sysAtivo = obj
 }
-
-
 exports.getSistemaAtivo = function() {
 	return sysAtivo
 }
@@ -217,6 +216,13 @@ let updateDataObj = function( dataObj, tableName, pkColumn ) {
 	})
 }
 
-exports.delSaveObj = function( table, dataObj ) {
-
+exports.delDataObj = function( dataObj, tableName, pkColumn ) {
+	return new Promise(( resolve, reject ) => {
+		let pkValue = dataObj[pkColumn]
+		let qry = `DELETE FROM ${tableName} WHERE ${pkColumn} = ${pkValue}`
+		db.run( qry, [], function( err ) {
+			if( err ) throw err
+			else resolve( this.changes )
+		})
+	})
 }

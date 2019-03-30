@@ -13,7 +13,7 @@ let ControllerSelectEdit = function() {
 	}
 	this.logic = {
 		dataObjSaveFunc: null,
-		dataObjdelFunc: null,
+		dataObjDelFunc: null,
 		dataObjFactory: null,
 		dbTableName: null
 	}
@@ -27,7 +27,7 @@ ControllerSelectEdit.prototype.render = function() {
 	let sb = this.view.selectBox
 	let ip = this.view.inputField
 	let sf = this.logic.dataObjSaveFunc
-	let df = this.logic.dataObjdelFunc
+	let df = this.logic.dataObjDelFunc
 	let fc = this.logic.dataObjFactory
 	let tb = this.logic.dbTableName
 
@@ -93,10 +93,17 @@ ControllerSelectEdit.prototype.render = function() {
 		}
 	}
 
-	function clickBtDel() {
+	async function clickBtDel() {
 		selected = sb.options.item( sb.selectedIndex )
-		if( selected.obj )
+		if( selected.obj ) {
+			console.log("typeof df = " + typeof df)
+			console.log("typeof df = " + typeof sf)
+			if( typeof df === "function" ) {
+				let res = await df( selected.obj, tb, pk )
+				console.log( 'Resultado da exclusão: ' + res )
+			}
 			sb.remove( sb.selectedIndex )
+		}
 	}
 
 	return true
