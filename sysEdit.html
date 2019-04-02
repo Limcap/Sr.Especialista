@@ -14,37 +14,79 @@
 		<button id="btFinalizar">Finalizar edição</button>
 	</div>
 	
-	<div class="card">
+	<div class="card grow">
 		<h3>Descrição</h3>
-		<textarea id="inpDescricao" size=2 class="input100"></textarea>
-		<button id="btSalvarDesc">Salvar descrição</button>
+		<textarea id="inpDescricao" size=2 class="grow-1"></textarea>
+		<div><button id="btSalvarDesc">Salvar descrição</button></div>
 	</div>
 
-	<div class="card">
-		<h3>Perguntas</h3>
-		<select id="slcPergunta" size=5 class="input73L"></select>
-		<select id="slcValores" size=5 class="input73R"></select>
-		<div>
-			<input id="inpPergunta" class="input73L"/>
-			<input id="inpValor" class="input73R"/>
+	<div class="card grow">
+		<section class='section-73'>
+			<h3>Perguntas</h3>
+			<h3>Respostas</h3>
+		</section>
+		<section class='section-73 grow-1'>
+			<select id='slcPergunta' size=5></select>
+			<select id='slcResposta' size=5></select>
+		</section>
+		<section class='section-73'>
+			<input id='inpPergunta' />
+			<input id='inpResposta' />
+		</section>
+		<section class='section-73'>
+			<div>
+				<button id="btSalvarPergunta">&#10004;</button>
+				<button id="btApagarPergunta">&#10008;</button>
+			</div>
+			<div>
+				<button id="btSalvarResposta">&#10004;</button>
+				<button id="btApagarResposta">&#10008;</button>
+			</div>
+		</section>
+	</div>
+
+	<div class="card grow">
+			<section class='section-73'>
+				<h3>Objetivos</h3>
+				<h3>Conclusões</h3>
+			</section>
+			<section class='section-73 grow-1'>
+				<select id='slcObjetivo' size=5></select>
+				<select id='slcConclusao' size=5></select>
+			</section>
+			<section class='section-73'>
+				<input id='inpObjetivo' />
+				<input id='inpConclusao' />
+			</section>
+			<section class='section-73'>
+				<div>
+					<button id="btSalvarObjetivo">&#10004;</button>
+					<button id="btApagarObjetivo">&#10008;</button>
+				</div>
+				<div>
+					<button id="btSalvarConclusao">&#10004;</button>
+					<button id="btApagarConclusao">&#10008;</button>
+				</div>
+			</section>
 		</div>
-		<button id="btSalvarPergunta">&#10004;</button>
-		<button id="btApagarPergunta">&#10008;</button>
-	</div>
 
-	<div class="card">
+	<div class="card grow">
 			<h3>Resultados</h3>
-			<select id="slcResultado" class="input100" size=5></select>
-			<input id="inpResultado" class="input100"/>
-			<button id="btSalvarResultado">&#10004;</button>
-			<button id="btApagarResultado">&#10008;</button>
+			<select id="slcResultado" class="grow-1" size=5></select>
+			<input id="inpResultado"/>
+			<div>
+				<button id="btSalvarResultado">&#10004;</button>
+				<button id="btApagarResultado">&#10008;</button>
+			</div>
 	</div>
 
-	<div class="card">
+	<div class="card grow">
 		<h3>Condições</h3>
-		<select id="slcRegras" size=5 style="width:100%;"></select>
-		<button>Adicionar Regra</button>
-		<button>Excluir Regra</button>
+		<select id="slcRegras" size=5 class="grow-1"></select>
+		<div>
+			<button>Adicionar Regra</button>
+			<button>Excluir Regra</button>
+		</div>
 	</div>
 </body>
 
@@ -54,8 +96,7 @@
 // ---------- Imports
 const menu = require('./menu.js')
 const { remote } = require('electron')
-var dal = remote.require('./data-access-layer.js')
-console.log(dal)
+const dal = remote.require('./data-access-layer.js')
 const controllerSelectEdit = require('./controllerSelectEdit.js')
 const thisWin = remote.getCurrentWindow()
 
@@ -69,11 +110,6 @@ const inpDescricao = document.getElementById("inpDescricao")
 const btSalvarDesc = document.getElementById("btSalvarDesc")
 
 
-const slcValores = document.getElementById("slcValores")
-const slcConclusoes = document.getElementById("slcConclusoes")
-const slcRegras = document.getElementById("slcRegras")
-
-
 // ---------- INICIALIZAÇOES
 usuarioNome = dal.getPerfilAtivo().nome
 sistemaNome = dal.getSistemaAtivo().nome
@@ -84,48 +120,74 @@ txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
 
-
 // ---------- Events
 btFinalizar.addEventListener('click',clickBtFinalizar)
 
-// ---------- Inicialização do componente Perguntas
+
+// ---------- COMPONENTE PERGUNTAS
 let ctrlPerguntas = new controllerSelectEdit()
-dal.fetchAllFatos().then(perguntas => {
-	ctrlPerguntas.model.dataArray = perguntas
-	ctrlPerguntas.model.textColumn = "fato"
-	ctrlPerguntas.model.valueColumn = "id"
-	ctrlPerguntas.model.pkColumn = 'id'
-	
-	ctrlPerguntas.view.selectBox = document.getElementById("slcPergunta"),
-	ctrlPerguntas.view.inputField = document.getElementById('inpPergunta'),
-	ctrlPerguntas.view.buttonSave = document.getElementById('btSalvarPergunta'),
-	ctrlPerguntas.view.buttonDel = document.getElementById('btApagarPergunta')
+ctrlPerguntas.setView( 'slcPergunta','inpPergunta','btSalvarPergunta','btApagarPergunta' )
+ctrlPerguntas.setRefs( 'perguntas','id','pergunta','id' )
+// muda a lista de respostas de acordo com a pergunta selecionada
+ctrlPerguntas.logic.onSelect = function() {
+	let respostaArr = null
+	let perguntaDob = ctrlPerguntas.getSelectedDob()
+	if( perguntaDob ) {
+		respostaArr = []
+		if( perguntaDob.id ) {
+			respostasAll.forEach(respostaDob => {
+				if( respostaDob.pergunta_fk == perguntaDob.id ) {
+					respostaArr.push( respostaDob )
+				}
+			})
+		}
+	}
+	ctrlRespostas.model.dataArray = respostaArr
+	ctrlRespostas.render()
+}
+ctrlPerguntas.logic.dataObjSaveFunc = async function ( dobPergunta, tableName, pkName ) {
+	dobPergunta.sistema_fk = dal.getSistemaAtivo().id
+	return await dal.saveDataObj( dobPergunta, tableName, pkName )
+}
+ctrlPerguntas.logic.dataObjDelFunc = dal.delDataObj
 
-	ctrlPerguntas.logic.dataObjSaveFunc = dal.saveDataObj
-	ctrlPerguntas.logic.dataObjDelFunc = dal.delDataObj
-	ctrlPerguntas.logic.dataObjFactory = function() { return {sistema_fk:dal.getSistemaAtivo().id, fato:null} }
-	ctrlPerguntas.logic.dbTableName = "fatos"
-
+dal.fetchAll("perguntas").then(rows => {
+	ctrlPerguntas.model.dataArray = rows
 	ctrlPerguntas.render()
 })
 
-// ---------- Inicialização do componente Resultados
-let ctrlResultados = new controllerSelectEdit()
-dal.fetchAllFatos().then(resultados => {
-	ctrlResultados.model.dataArray = resultados
-	ctrlResultados.model.textColumn = "fato"
-	ctrlResultados.model.valueColumn = null
-	
-	ctrlResultados.view.selectBox = document.getElementById("slcResultado"),
-	ctrlResultados.view.inputField = document.getElementById('inpResultado'),
-	ctrlResultados.view.buttonSave = document.getElementById('btSalvarResultado'),
-	ctrlResultados.view.buttonDel = document.getElementById('btApagarResultado')
 
-	ctrlResultados.logic.saveFunction = null
-	ctrlResultados.logic.delFunction = null
+// ---------- COMPONENTE RESPOSTAS
+let ctrlRespostas = new controllerSelectEdit()
+ctrlRespostas.setView( 'slcResposta','inpResposta','btSalvarResposta','btApagarResposta' )
+ctrlRespostas.setRefs( 'respostas','id','resposta','id' )
+ctrlRespostas.logic.dataObjDelFunc = dal.delDataObj
+ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pkName  ) {
+	let perguntaDob = ctrlPerguntas.getSelectedDob()
+	if( !perguntaDob || !perguntaDob.id ) {
+		alert( "Selecione uma pergunta primeiro ")
+		return false
+	} else {
+		//respostaDob.sistema_fk = dal.getSistemaAtivo().id
+		respostaDob.pergunta_fk = perguntaDob.id
+		return await dal.saveDataObj( respostaDob, tableName, pkName )
+	}
+}
 
-	ctrlResultados.render()
-})
+let respostasAll
+dal.fetchAll("respostas").then( rows => respostasAll = rows )
+
+/**
+ * Retorna o campo ID do DOB associado ao <option>
+ * selecionado do <select> identificado no argumento
+ **/
+function getSelectedOptionId( selectBoxID ) {
+	let selectBox = document.getElementById( selectedBoxID )
+	let option = selectBox.options.item( selectBox.selectedIndex )
+	let id = option.obj.id
+	return id
+}
+
 
 // ---------
 function clickBtFinalizar(){

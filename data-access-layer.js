@@ -1,5 +1,6 @@
 const fs = require('fs')
 const sqlite3 = require('sqlite3').verbose();
+const out = require('./out')
 
 
 // ---------- States
@@ -121,11 +122,22 @@ getPerfilPublico = function(callback) {
 
 
 /**
- * Busca todos os fatos do sistema ativo
+ * Busca todos os registro de uma tabela selecionada do sistema ativo
  */
-exports.fetchAllFatos = function() {
+exports.fetchAll = function( tableName ) {
 	return new Promise((resolve, reject) => {
-		let qry = "SELECT * FROM fatos WHERE sistema_fk = ?"
+		let qry
+		switch( tableName ) {
+			case 'respostas':
+				qry = `SELECT respostas.* FROM respostas INNER JOIN perguntas ON respostas.pergunta_fk = perguntas.id WHERE perguntas.sistema_fk = ?`
+				break;
+			case 'conclusoes':
+				qry = `SELECT conclusoes.* FROM conclusoes INNER JOIN objetivos ON conclusoes.objetivo_fk = conclusoes.id WHERE sistema_fk = ?`
+				break;
+			default:
+				qry = `SELECT * FROM ${tableName} WHERE sistema_fk = ?`
+		}
+		console.log(qry)
 		db.all(qry, [sysAtivo.id], (err, rows) => {
 		if (err) reject(err)
 		else resolve(rows)
@@ -133,7 +145,17 @@ exports.fetchAllFatos = function() {
 	})
 }
 
+exports.fetchRespostas = function( pergunta_fk ) {
+	return new Promise(( resolve, reject) => {
+		let qry = `SELECT respostas.* FROM respostas INNER JOIN perguntas ON respostas.pergunta_fk = perguntas.id WHERE sistema_fk = ? AND pergunta_fk = ?`
+		db.all(qry, [sysAtivo.id], (err, rows) => {
+			if( err ) reject(err)
+			else resolve(rows)
+		})
+	})
+}
 
+/*
 exports.oldsaveDataObj = function( table, dataObj ) {
 	console.log(dataObj)
 	if( !dataObj.id) {
@@ -162,23 +184,44 @@ exports.oldsaveDataObj = function( table, dataObj ) {
 		let qry = `UPDATE ${table} SET ${pairs} WHERE ${pkColumn} = ${dataObj.id}`
 	}
 }
+*/
+
+/*
+exports.saveDataObj_TEST = async function( dataObj, tableName, pkColumn ) {
+	isInsert = dataObj.hasOwnProperty( pkColumn )
+	let qry
+	if( !isInsert ) {
+		let columns = Object.keys( dataObj ).join( ',' )
+		let values = Object.values( dataObj ).join( '","' )
+		qry = `INSERT INTO ${tableName} (${columns}) VALUES ("${values}")`
+	} else {
+		let pairs = Object.entries( dataObj )
+		pairs = pairs.filter(x => x[0] != pkColumn).map( x => x[0]+' = "'+x[1]+'"' ).join( ',' )
+		let pkValue = dataObj[pkColumn]
+		qry = `UPDATE ${tableName} SET ${pairs} WHERE ${pkColumn} = ${pkValue}`
+	}
+	out(qry)
+	return { err:qry }
+}
+*/
 
 exports.saveDataObj = async function( dataObj, tableName, pkColumn ) {
 	isInsert = dataObj.hasOwnProperty( pkColumn )
-	let rowid
+	let res
 	if( isInsert ) {
-		rowid = await updateDataObj( dataObj, tableName, pkColumn )
+		res = await updateDataObj( dataObj, tableName, pkColumn )
 	} else {
-		rowid = await insertDataObj( dataObj, tableName )
+		res = await insertDataObj( dataObj, tableName )
 	}
 /*
 	rowid = isInsert ?
 		await insertDataObj( dataObj, tableName ) :
 		await updateDataObj( dataObj, tableName, pkColumn )
 */
-	let row
-	row = await getDataObjByRowId( tableName, rowid )
-	return row
+	if( !res.err ) {
+		res.dob = await getDataObjByRowId( tableName, res.lastID )
+	}
+	return res
 }
 
 let getDataObjByRowId = function( tableName, rowid ) {
@@ -197,8 +240,7 @@ let insertDataObj = function( dataObj, tableName ) {
 		let values = Object.values( dataObj ).join( '","' )
 		let qry = `INSERT INTO ${tableName} (${columns}) VALUES ("${values}")`
 		db.run(qry, [], function( err ) {
-			if( err ) throw( err )
-			else resolve( this.lastID )
+			resolve( { err:err, lastID:this.lastID } )
 		})
 	})
 }
@@ -210,8 +252,7 @@ let updateDataObj = function( dataObj, tableName, pkColumn ) {
 		let pkValue = dataObj[pkColumn]
 		let qry = `UPDATE ${tableName} SET ${pairs} WHERE ${pkColumn} = ${pkValue}`
 		db.run(qry, [], function( err ) {
-			if( err ) throw( err )
-			else resolve( pkValue )
+			resolve( { err:err, lastID:pkValue } )
 		})
 	})
 }
@@ -221,8 +262,7 @@ exports.delDataObj = function( dataObj, tableName, pkColumn ) {
 		let pkValue = dataObj[pkColumn]
 		let qry = `DELETE FROM ${tableName} WHERE ${pkColumn} = ${pkValue}`
 		db.run( qry, [], function( err ) {
-			if( err ) throw err
-			else resolve( this.changes )
+			resolve( {err:err, deleted:this.changes} )
 		})
 	})
 }

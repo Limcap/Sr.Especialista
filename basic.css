@@ -1,12 +1,13 @@
 * {
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	box-sizing: border-box;
+	min-width:2em;
 }
 
 body {
 	background: url("./checkeredTransparentLight.png") repeat fixed;
 	background-size: 25px;
-	margin: 0;
+	margin: 1em;
 }
 
 h3 {
@@ -18,11 +19,25 @@ p {
 }
 
 .card {
-	margin: 1em;
+	min-width: 20em;
+	max-width: 1000px;
+	margin: 1em auto;
 	background-color: rgba(255,255,255,0.9);
 	padding: 1em;
 	box-shadow: 3px 5px 5px rgba(0,0,0,0.2);
 	border-radius: 3px;
+}
+
+.card.grow {
+	display: flex;
+	flex-direction: column;
+	resize: vertical;
+	overflow: auto;
+}
+
+.card.grow > * {
+	flex-grow: 0;
+	flex-shrink: 0;
 }
 
 .card textarea,
@@ -31,6 +46,36 @@ p {
 	margin-bottom: 1em;
 }
 
+.card textarea,
+.card select {
+	resize: none;
+}
+
+.grow-1 {
+	flex-grow: 1 !important;
+}
+
+.section-73 {
+	display: flex;
+}
+.section-73 > *:first-child {
+	flex-grow: 6;
+	flex-basis: 0;
+	margin-right: 1em;
+}
+.section-73 > *:nth-child(2) {
+	flex-grow: 4;
+	flex-basis: 0;
+}
+
+.flex-v-1 {
+	display: flex;
+	flex-direction: column;
+}
+.bt-max-5 > button {
+	max-width: 10em ;
+}
+/*
 .input73L {
 	width: 69%;
 }
@@ -48,3 +93,4 @@ textarea.input100 {
 	resize: none;
 	overflow-y: scroll;
 }
+*/

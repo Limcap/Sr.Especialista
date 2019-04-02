@@ -1,20 +1,23 @@
 const { app, BrowserWindow } = require('electron')
-var dal = require("./data-access-layer.js")
+var dal = require('./data-access-layer')
+var out = require('./out')
 
-// ---------- Inicialização
+
+// ---------- CONECTAR BANCO DE DADOS
 dal.conectarDb()
 
-// ---------- Funções
+
+// ---------- INICIALIZAR JANELA
+let win
 function createWindow () {
-  // Create the browser window.
-  let win = new BrowserWindow({ width: 800, height: 600 })
-  // and load the index.html of the app.
+  win = new BrowserWindow({ width: 800, height: 600 })
   win.loadFile('login.html')
   //win.webContents.openDevTools()
 }
 app.on('ready', createWindow)
 
 
+// ---------- REINICIALIZAR DAO (Mais para desenvolvimento)
 const ipc = require('electron').ipcMain
 ipc.on('reload-dao',function(ev, arg) {
 	let perfilAtivo = dal.getPerfilAtivo()
@@ -25,6 +28,7 @@ ipc.on('reload-dao',function(ev, arg) {
 	dal.setPerfilAtivo(perfilAtivo)
 	dal.setSistemaAtivo(sysAtivo)
 })
+
 
 /*
 const fs = require('fs')
