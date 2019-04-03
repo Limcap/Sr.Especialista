@@ -214,7 +214,7 @@ exports.saveDataObj = async function( dataObj, tableName, pkColumn ) {
 		res = await insertDataObj( dataObj, tableName )
 	}
 /*
-	rowid = isInsert ?
+	res = isInsert ?
 		await insertDataObj( dataObj, tableName ) :
 		await updateDataObj( dataObj, tableName, pkColumn )
 */

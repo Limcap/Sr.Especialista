@@ -127,7 +127,13 @@ btFinalizar.addEventListener('click',clickBtFinalizar)
 // ---------- COMPONENTE PERGUNTAS
 let ctrlPerguntas = new controllerSelectEdit()
 ctrlPerguntas.setView( 'slcPergunta','inpPergunta','btSalvarPergunta','btApagarPergunta' )
-ctrlPerguntas.setRefs( 'perguntas','id','pergunta','id' )
+ctrlPerguntas.setRefs( 'pergunta','id','sistema_fk',sistemaId )
+ctrlPerguntas.data.fetch = () => dal.fetchAll('perguntas')
+ctrlPerguntas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'perguntas',pkName)
+ctrlPerguntas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'perguntas',pkName)
+ctrlPerguntas.boot()
+
+/*
 // muda a lista de respostas de acordo com a pergunta selecionada
 ctrlPerguntas.logic.onSelect = function() {
 	let respostaArr = null
@@ -155,12 +161,19 @@ dal.fetchAll("perguntas").then(rows => {
 	ctrlPerguntas.model.dataArray = rows
 	ctrlPerguntas.render()
 })
-
+*/
 
 // ---------- COMPONENTE RESPOSTAS
 let ctrlRespostas = new controllerSelectEdit()
 ctrlRespostas.setView( 'slcResposta','inpResposta','btSalvarResposta','btApagarResposta' )
-ctrlRespostas.setRefs( 'respostas','id','resposta','id' )
+ctrlRespostas.setRefs( 'resposta','id','pergunta_fk' )
+ctrlRespostas.data.fetch = () => dal.fetchAll("respostas")
+ctrlRespostas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'respostas',pkName)
+ctrlRespostas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'respostas',pkName)
+ctrlRespostas.boot()
+
+ctrlPerguntas.updateChild( ctrlRespostas )
+/*
 ctrlRespostas.logic.dataObjDelFunc = dal.delDataObj
 ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pkName  ) {
 	let perguntaDob = ctrlPerguntas.getSelectedDob()
@@ -174,8 +187,7 @@ ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pk
 	}
 }
 
-let respostasAll
-dal.fetchAll("respostas").then( rows => respostasAll = rows )
+
 
 /**
  * Retorna o campo ID do DOB associado ao <option>

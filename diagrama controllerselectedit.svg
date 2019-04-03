@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1000"
+   height="600"
+   viewBox="0 0 1000 600"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="diagrama controllerselectedit.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4812">
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="0"
+         id="stop4808" />
+      <stop
+         style="stop-color:#808080;stop-opacity:0;"
+         offset="1"
+         id="stop4810" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4812"
+       id="linearGradient4806"
+       x1="520"
+       y1="194"
+       x2="390"
+       y2="266"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1,0,0,0.83333332,0,-121.66667)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="527.5"
+     inkscape:cy="300"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4983-7-6-6"
+     showgrid="true"
+     units="px"
+     inkscape:showpageshadow="false"
+     inkscape:pagecheckerboard="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:connector-spacing="10">
+    <inkscape:grid
+       type="xygrid"
+       id="grid-default"
+       spacingx="1"
+       spacingy="1"
+       color="#000000"
+       opacity="0.03921569"
+       empcolor="#000000"
+       empopacity="0.11764706"
+       enabled="true"
+       dotted="false"
+       empspacing="10" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1" />
+  <path
+     style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 220,70.000002 60,-10e-7"
+     id="path4814"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#rect4816"
+     inkscape:connection-end="#g4993" />
+  <g
+     id="g4983"
+     transform="translate(170,80)"
+     inkscape:label="box">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0"
+       style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5220">table name</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5254">text column</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="247.33333"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5222">pk column</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="274"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5224">fk column</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="300.66666"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5226">fk value</tspan></text>
+    <text
+       id="text4820-1-2-6"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         id="tspan4818-1-0-5"
+         sodipodi:role="line">references</tspan></text>
+  </g>
+  <path
+     style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 480,77.142857 770,97.857143"
+     id="path5000"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#g4993"
+     inkscape:connection-end="#g4983-0" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 442.55319,100 770,257.04082"
+     id="path5002"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#g4993"
+     inkscape:connection-end="#g4983" />
+  <g
+     id="g4983-0"
+     transform="translate(170,-120)"
+     inkscape:label="box view"
+     inkscape:connector-avoid="true">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0-3"
+       style="opacity:1;fill:#cdde87;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2-7"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5220-5">select box</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5254-6">input field</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="247.33333"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5222-1">save button</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="274"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5226-6">delete button</tspan></text>
+    <text
+       id="text4820-1-2-6-1"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         id="tspan4818-1-0-5-7"
+         sodipodi:role="line">view</tspan></text>
+  </g>
+  <g
+     id="g4983-7"
+     transform="translate(-340,280)"
+     inkscape:label="box">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0-2"
+       style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2-8"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5220-4">on select</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5226-4">on save</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="247.33333"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5359">on delete</tspan></text>
+    <text
+       id="text4820-1-2-6-8"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         sodipodi:role="line"
+         id="tspan5429">ext hooks</tspan></text>
+  </g>
+  <g
+     id="g4983-7-6-6"
+     transform="translate(-100,280)"
+     inkscape:label="box">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0-2-2-8"
+       style="opacity:1;fill:#dde9af;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2-8-7-4"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5359-6-1">this.child</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5575">proto.setChild()</tspan></text>
+    <text
+       id="text4820-1-2-6-8-6-5"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         sodipodi:role="line"
+         id="tspan5429-1-8">child</tspan></text>
+  </g>
+  <g
+     id="g4983-7-5"
+     transform="translate(170,280)"
+     inkscape:label="box">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0-2-5"
+       style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2-8-4"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5226-4-9">on save</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5359-5">on delete</tspan></text>
+    <text
+       id="text4820-1-2-6-8-2"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         id="tspan4818-1-0-5-1-4"
+         sodipodi:role="line">db hooks</tspan></text>
+  </g>
+  <g
+     id="g4983-7-6"
+     transform="translate(-580,70)"
+     inkscape:label="box">
+    <rect
+       y="130"
+       x="600"
+       height="190"
+       width="200"
+       id="rect4816-7-1-0-2-2"
+       style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke"
+       inkscape:label="rect" />
+    <text
+       id="text4820-1-2-6-2-8-7"
+       y="194"
+       x="701.53479"
+       style="font-style:normal;font-weight:normal;font-size:26.66666603px;line-height:100%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="text"><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="194"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5220-4-6">on select</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="220.66667"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5226-4-7">on save</tspan><tspan
+         style="font-size:20px;line-height:100%;text-align:center;text-anchor:middle;fill:#4d4d4d"
+         y="247.33333"
+         x="701.53479"
+         sodipodi:role="line"
+         id="tspan5359-6">on delete</tspan></text>
+    <text
+       id="text4820-1-2-6-8-6"
+       y="169"
+       x="699.89709"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       inkscape:label="title"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="169"
+         x="699.89709"
+         sodipodi:role="line"
+         id="tspan5429-1">child hooks</tspan></text>
+  </g>
+  <g
+     id="g4993"
+     transform="translate(-50)"
+     inkscape:label="box setup">
+    <rect
+       y="40"
+       x="330"
+       height="60"
+       width="200"
+       id="rect4816-7"
+       style="opacity:1;fill:#afe9dd;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke" />
+    <text
+       id="text4820-1"
+       y="79"
+       x="429.89713"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="79"
+         x="429.89713"
+         id="tspan4818-1"
+         sodipodi:role="line">setup()</tspan></text>
+  </g>
+  <g
+     id="g4998"
+     inkscape:label="box controller">
+    <rect
+       y="40.000004"
+       x="20"
+       height="60"
+       width="200"
+       id="rect4816"
+       style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke" />
+    <text
+       id="text4820"
+       y="79"
+       x="119.89713"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-size:26.66666603px;text-align:center;text-anchor:middle"
+         y="79"
+         x="119.89713"
+         id="tspan4818"
+         sodipodi:role="line">controller</tspan></text>
+  </g>
+  <path
+     style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 770,416.22449 413.7931,100"
+     id="path5559"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="ccc"
+     inkscape:connection-start="#g4983-7-5"
+     inkscape:connection-end="#g4993" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 395.17241,100 551.95402,410"
+     id="path5567"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#g4993"
+     inkscape:connection-end="#g4983-7-6-6" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 378.62069,100 364.36782,410"
+     id="path5569"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#g4993"
+     inkscape:connection-end="#g4983-7" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="M 120,100 V 200"
+     id="path5571"
+     inkscape:connector-type="polyline"
+     inkscape:connector-curvature="0"
+     inkscape:connection-start="#g4998"
+     inkscape:connection-end="#g4983-7-6" />
+</svg>
