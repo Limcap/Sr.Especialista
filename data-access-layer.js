@@ -140,7 +140,7 @@ exports.fetchAll = function( tableName ) {
 				qry = `SELECT respostas.* FROM respostas INNER JOIN perguntas ON respostas.pergunta_fk = perguntas.id WHERE perguntas.sistema_fk = ?`
 				break;
 			case 'conclusoes':
-				qry = `SELECT conclusoes.* FROM conclusoes INNER JOIN objetivos ON conclusoes.objetivo_fk = conclusoes.id WHERE sistema_fk = ?`
+				qry = `SELECT conclusoes.* FROM conclusoes INNER JOIN objetivos ON conclusoes.objetivo_fk = objetivos.id WHERE objetivos.sistema_fk = ?`
 				break;
 			default:
 				qry = `SELECT * FROM ${tableName} WHERE sistema_fk = ?`
@@ -270,6 +270,7 @@ exports.delDataObj = function( dataObj, tableName, pkColumn ) {
 		let pkValue = dataObj[pkColumn]
 		let qry = `DELETE FROM ${tableName} WHERE ${pkColumn} = ${pkValue}`
 		db.run( qry, [], function( err ) {
+			if( err ) throw err
 			resolve( {err:err, deleted:this.changes} )
 		})
 	})

@@ -171,8 +171,8 @@ ctrlRespostas.data.fetch = () => dal.fetchAll("respostas")
 ctrlRespostas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'respostas',pkName)
 ctrlRespostas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'respostas',pkName)
 ctrlRespostas.boot()
-
 ctrlPerguntas.updateChild( ctrlRespostas )
+
 /*
 ctrlRespostas.logic.dataObjDelFunc = dal.delDataObj
 ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pkName  ) {
@@ -186,20 +186,27 @@ ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pk
 		return await dal.saveDataObj( respostaDob, tableName, pkName )
 	}
 }
+*/
 
+// ---------- COMPONENTE OBJETIVOS
+let ctrlObjetivos = new controllerSelectEdit()
+ctrlObjetivos.setView( 'slcObjetivo','inpObjetivo','btSalvarObjetivo','btApagarObjetivo' )
+ctrlObjetivos.setRefs( 'objetivo','id','sistema_fk',sistemaId )
+ctrlObjetivos.data.fetch = () => dal.fetchAll('objetivos')
+ctrlObjetivos.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'objetivos',pkName)
+ctrlObjetivos.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'objetivos',pkName)
+ctrlObjetivos.boot()
 
+// ---------- COMPONENTE CONCLUSOES
+let ctrlConclusoes = new controllerSelectEdit()
+ctrlConclusoes.setView( 'slcConclusao','inpConclusao','btSalvarConclusao','btApagarConclusao' )
+ctrlConclusoes.setRefs( 'conclusao','id','objetivo_fk' )
+ctrlConclusoes.data.fetch = () => dal.fetchAll('conclusoes')
+ctrlConclusoes.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'conclusoes',pkName)
+ctrlConclusoes.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'conclusoes',pkName)
+ctrlConclusoes.boot()
 
-/**
- * Retorna o campo ID do DOB associado ao <option>
- * selecionado do <select> identificado no argumento
- **/
-function getSelectedOptionId( selectBoxID ) {
-	let selectBox = document.getElementById( selectedBoxID )
-	let option = selectBox.options.item( selectBox.selectedIndex )
-	let id = option.obj.id
-	return id
-}
-
+ctrlObjetivos.updateChild( ctrlConclusoes )
 
 // ---------
 function clickBtFinalizar(){
