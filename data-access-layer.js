@@ -37,6 +37,14 @@ exports.conectarDb = function() {
 		console.log('Connected to the database.');
 		console.log(db)
 	});
+
+	db.exec('PRAGMA foreign_keys = ON;', error => {
+		if (error){
+			 console.error("Pragma statement didn't work.")
+		} else {
+			 console.log("Foreign Key Enforcement is on.")
+		}
+	})
 }
 
 

@@ -186,7 +186,6 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
 	let newText = v.inputField.value.trim()
 	let oldText = selected.text
 
-	out("Controller.clickBtSave") 
 	if( newText.length > 0 ) {		
 		// modo 'insert' se a opção '+' estiver selecionada (ela não possui um dob associado)
 		let isInsert = !selected.dob
