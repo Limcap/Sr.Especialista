@@ -1,15 +1,10 @@
-let condArr = []
-
+/*
 let objetivoDOB
 let conclusaoDOB
-let respostaDOB
-let perguntaDOB
-let slcCondicao = document.getElementById('slcCondicao')
-let inpResultado = document.getElementById('inpResultado')
 let btSalvarCondicao = document.getElementById('btSalvarCondicao')
 
 btSalvarCondicao.addEventListener('click',exports.adicionarCondicao)
-
+*/
 
 
 exports.view = {
@@ -28,7 +23,10 @@ exports.ctrl = {
 	respostas: null
 }
 
-exports.data = []
+exports.data = {
+	all: [],
+	render: []
+}
 
 
 
@@ -54,7 +52,6 @@ exports.setCtrl = function( ctrlObjetivos, ctrlConclusoes, ctrlPerguntas, ctrlRe
 
 exports.inicializar = async function( self ) {
 	await this.carregarDados()
-	//this.render()
 	this.configViewEvents()
 	this.configConclusaoSelectEvent( self )
 	return true
@@ -62,25 +59,18 @@ exports.inicializar = async function( self ) {
 
 
 
+// Carrega os dados e associa um <option> a cada DOB
 exports.carregarDados = async function() {
-	let rawArr =  await dal.fetchAll('condicoes_unrolled')
-	let tidyArr = []
-	for( let i = 0; i < rawArr.length; i++ ) {
-		let dob = rawArr[i]
-		if( tidyArr[dob.grupo] === undefined ) {
-			tidyArr[dob.grupo] = []
-		}
-		tidyArr[dob.grupo].push( dob )
-		let opt = this.newOpt( dob.pergunta + ' = ' + dob.resposta )
-		opt.dob = dob
-		dob.opt = opt
+	this.data.all = await dal.fetchAll('condicoes_unrolled')
+	for( let i = 0; i < this.data.all.length; i++ ) {
+		let opt = this.newOpt('')
+		opt.DOB = this.data.all[i]
+		this.data.all[i].opt = opt	
 	}
-	console.log(tidyArr)
-	this.data = tidyArr
 }
 
 
-
+/*
 exports.populateSlctBox = function() {
 	for( let i = 0; i < this.data.length; i++ ) {
 		grupoArr = this.data[i]
@@ -95,7 +85,7 @@ exports.populateSlctBox = function() {
 		}
 	}
 }
-
+*/
 
 
 exports.newOpt = function( text ) {
@@ -107,8 +97,10 @@ exports.newOpt = function( text ) {
 
 
 exports.configViewEvents = function() {
-	this.attachEvent(this.view.btnSave,'click',this.adicionarCondicao)
-	
+	this.attachEvent( this.view.btnSave,'click',this.btnSaveClick )
+	this.attachEvent( this.view.btnDel,'click',this.btnDelClick )
+	this.attachEvent( this.view.btnUp,'click',this.btnUpClick )
+	this.attachEvent( this.view.btnDown,'click',this.btnDownClick )
 }
 
 
@@ -138,34 +130,66 @@ exports.atualizarResultado = function( opt ) {
 
 
 
-exports.adicionarCondicao = function() {
-	objetivoDOB = ctrlObjetivos.getSelectedDob()
-	conclusaoDOB = ctrlConclusoes.getSelectedDob()
-	respostaDOB = ctrlRespostas.getSelectedDob()
-	perguntaDOB = ctrlPerguntas.getSelectedDob()	
-
-	let newOpt = document.createElement('option')
-	newOpt.resposta_fk = respostaDOB.id
-	newOpt.conclusao_fk = conclusaoDOB.id
-	newOpt.text = perguntaDOB.pergunta + ' = ' + respostaDOB.resposta
-	slcCondicao.options.add( newOpt )
+exports.btnSaveClick = function( ev ) {
+	ev.target.controller.adicionarCondicao()
 }
 
 
 
-exports.criarDOB = function() {
-	objetivoDOB = this.ctrl.objetivos.getSelectedDob()
-	conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
-	respostaDOB = this.ctrl.respostas.getSelectedDob()
-	perguntaDOB = this.ctrl.perguntas.getSelectedDob()
+exports.adicionarCondicao = function() {
+	let objetivoDOB = this.ctrl.objetivos.getSelectedDob()
+	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
+	let respostaDOB = this.ctrl.respostas.getSelectedDob()
+	let perguntaDOB = this.ctrl.perguntas.getSelectedDob()
 
-	let newDOB = {
-		id: null,
-		objetivo_fk: objetivoDOB.id,
-		conclusao_fk: conclusaoDOB.id,
-		pergunta_fk: perguntaDOB.id,
-		resposta_fk: respostaDOB.id
+	let grupo = 0
+	let condicaoOpt  = this.view.slcBox.selectedOptions[0]
+	grupo = condicaoOpt && condicaoOpt.DOB ? condicaoOpt.DOB.grupo : 0
+
+	if( !objetivoDOB ) alert('Selecione um objetivo')
+	else if( !conclusaoDOB ) alert('Selecione uma conclusão')
+	else if( !perguntaDOB ) alert('Selecione uma pergunta')
+	else if( !respostaDOB ) alert('Selecione uma resposta')
+	else {
+		let newDOB = {
+			id: null,
+			objetivo_fk: objetivoDOB.id,
+			conclusao_fk: conclusaoDOB.id,
+			pergunta_fk: perguntaDOB.id,
+			resposta_fk: respostaDOB.id,
+			grupo: grupo
+		}
+		let newOpt = document.createElement('option')
+		newDOB.opt = newOpt
+		newOpt.DOB = newDOB
+		this.data.all.push( newDOB )
+		this.render()
 	}
+}
+
+
+
+exports.btnDelClick = function( ev ) {
+	ev.target.controller.apagarCondicao()
+}
+
+
+
+exports.apagarCondicao = function() {
+	selectedOpt = this.view.slcBox.selectedOptions[0]
+	if( selectedOpt && selectedOpt.DOB ) {
+		// remover referências ciclicas para permitir 
+		// garbage collection
+		let DOB = selectedOpt.DOB
+		selectedOpt.DOB = null
+		DOB.opt = null
+		for( let i = 0; i < this.data.all.length; i++ ) {
+			if( this.data.all[i] == DOB ) {
+				this.data.all.splice( i, 1 )
+			}
+		}
+	}
+	this.render()
 }
 
 
@@ -176,7 +200,8 @@ exports.render = function() {
 	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
 	this.view.inpBox.value = objetivoDOB.objetivo + ' = ' + conclusaoDOB.conclusao
 	
-	let renderArray = this.criarRenderArray()
+	this.criarRenderArray()
+	let renderArray = this.data.render
 	let slcBox = this.view.slcBox
 	slcBox.innerHTML = ''
 
@@ -204,26 +229,25 @@ exports.criarRenderArray = function() {
 	// itera por todas as condicoes, procurando as que são referentes
 	// à conclusao selecionada, e as adiciona organizadamente por grupo
 	// no renderArray
-	for( let i = 0; i < this.data.length; i++ ) {
-		grupoArr = this.data[i]
-		for( let j = 0; j < grupoArr.length; j ++ ) {
-			let condicaoDOB = grupoArr[j]
-			//console.log(condicaoDOB.conclusao_fk +' = '+conclusaoID)
-			if( condicaoDOB.conclusao_fk == conclusaoID ) {
-				this.updateOptText( condicaoDOB )
-				if( renderArray[condicaoDOB.grupo] === undefined ) {
-					renderArray[condicaoDOB.grupo] = []
-				}
-				renderArray[condicaoDOB.grupo].push( condicaoDOB )
+	for( let i = 0; i < this.data.all.length; i++ ) {
+		let condicaoDOB = this.data.all[i]
+		//console.log(condicaoDOB.conclusao_fk +' = '+conclusaoID)
+		if( condicaoDOB.conclusao_fk == conclusaoID ) {
+			this.updateOptText( condicaoDOB )
+			if( renderArray[condicaoDOB.grupo] === undefined ) {
+				renderArray[condicaoDOB.grupo] = []
 			}
+			renderArray[condicaoDOB.grupo].push( condicaoDOB )
 		}
 	}
 	// remove arrays vazios
-	for( let i = 0; i < renderArray.length; i++ ) {
-		if( !renderArray[i] || renderArray[i].length == 0 )
-			renderArray.splice(i,1)
-	}
-	return renderArray
+	renderArray = renderArray.filter( arr => !!arr && arr.length > 0 )
+	//for( let i = 0; i < renderArray.length; i++ ) {
+	//	if( !renderArray[i] || renderArray[i].length == 0 )
+	//		renderArray.splice(i,1)
+	//}
+	this.data.render = renderArray
+	console.log(this.data.render)
 }
 
 
@@ -246,4 +270,34 @@ exports.updateOptText = function( DOB ) {
 		}
 	}
 	DOB.opt.text = pergunta + ' = ' + resposta
+}
+
+
+
+exports.btnUpClick = function( ev ) {
+	ev.target.controller.mudarDeGrupo(-1)
+}
+
+
+
+exports.btnDownClick = function( ev ) {
+	ev.target.controller.mudarDeGrupo(1)
+}
+
+
+
+exports.mudarDeGrupo = function( offset ) {
+	let selectedOpt = this.view.slcBox.selectedOptions[0]
+	if( selectedOpt && selectedOpt.DOB ) {
+		let DOB = selectedOpt.DOB
+		let grupo = DOB.grupo
+		let rA = this.data.render
+		let existeGrupoAnterior = !!rA[grupo-1] && rA[grupo-1].length > 0
+		if( offset > 0 && ( grupo == 0 || existeGrupoAnterior ) )
+			DOB.grupo += 1
+		if( offset < 0 && grupo > 0 )
+			DOB.grupo -= 1
+		console.log('grupo: ' + grupo + ' - novo grupo: ' + DOB.grupo)
+	}
+	this.render()
 }
