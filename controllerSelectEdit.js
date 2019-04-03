@@ -145,12 +145,13 @@ ControllerSelectEdit.prototype._newOption = function( text, value, dob ) {
 
 
 ControllerSelectEdit.prototype._insertEmptyOpt = function( focus ) {
-	if(!focus) focus = true
+	if( focus === undefined ) focus = true
 	let newOpt = this._newOption( "+", null, null )
 	this.view.selectBox.options.add( newOpt )
 	if( focus ) {
 		//slcBox.selectedIndex = slcBox.length-1
 		newOpt.selected = true
+		this.view.inputField.value = ''
 		//clickOpt( {target:newOpt} )
 	}
 }
@@ -162,6 +163,7 @@ ControllerSelectEdit.prototype._changeOpt = function( ev ) {
 	let opt = slcBox.selectedOptions[0]
 	let inpBox = slcBox.controller.view.inputField
 	inpBox.value = opt.dob ? opt.text : ""
+	if( !opt.dob ) inpBox.focus()
 	//console.log( 'dob selected:\n' );console.log( opt.dob )
 	ev.target.controller.updateChild()
 	// executa custom function onSelect 
@@ -210,7 +212,16 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
 				selected.text = res.dob[r.textColumn]
 				if( isInsert ) {
 					ctrl._addDOB( selected.dob )
-					ctrl._insertEmptyOpt()
+					if(ctrl._child) {
+						ctrl._insertEmptyOpt( false )
+						// atualiza a visualizacao do child
+						ctrl.updateChild()
+						// poe o cursor no input do child
+						ctrl._child.view.inputField.focus()
+					} else {
+						ctrl._insertEmptyOpt()
+						ctrl.view.inputField.focus()
+					}
 				}
 			}
 		} else { // não existe função de salvamento
