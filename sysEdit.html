@@ -71,23 +71,23 @@
 		</div>
 
 	<div class="card grow">
-			<h3>Resultados</h3>
-			<select id="slcResultado" class="grow-1" size=5></select>
-			<input id="inpResultado"/>
+			<h3>Condições</h3>
+			<div class='flex-v-1'>
+				<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
+			</div>
+			<div id='Resultado'>
+				SE
+			</div>
+			<select id="slcCondicao" class="grow-1" size=5></select>
 			<div>
-				<button id="btSalvarResultado">&#10004;</button>
-				<button id="btApagarResultado">&#10008;</button>
+				<button id="btSalvarCondicao">Incluir par pergunta/resposta</button>
+				<button id="btApagarCondicao">&#10008;</button>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<button id='btUp'>&#9650;</button>
+				<button id='btDown'>&#9660;</button><!--   -->
 			</div>
 	</div>
 
-	<div class="card grow">
-		<h3>Condições</h3>
-		<select id="slcRegras" size=5 class="grow-1"></select>
-		<div>
-			<button>Adicionar Regra</button>
-			<button>Excluir Regra</button>
-		</div>
-	</div>
 </body>
 
 
@@ -124,44 +124,7 @@ inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
 btFinalizar.addEventListener('click',clickBtFinalizar)
 
 
-// ---------- COMPONENTE PERGUNTAS
-let ctrlPerguntas = new controllerSelectEdit()
-ctrlPerguntas.setView( 'slcPergunta','inpPergunta','btSalvarPergunta','btApagarPergunta' )
-ctrlPerguntas.setRefs( 'pergunta','id','sistema_fk',sistemaId )
-ctrlPerguntas.data.fetch = () => dal.fetchAll('perguntas')
-ctrlPerguntas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'perguntas',pkName)
-ctrlPerguntas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'perguntas',pkName)
-ctrlPerguntas.boot()
 
-/*
-// muda a lista de respostas de acordo com a pergunta selecionada
-ctrlPerguntas.logic.onSelect = function() {
-	let respostaArr = null
-	let perguntaDob = ctrlPerguntas.getSelectedDob()
-	if( perguntaDob ) {
-		respostaArr = []
-		if( perguntaDob.id ) {
-			respostasAll.forEach(respostaDob => {
-				if( respostaDob.pergunta_fk == perguntaDob.id ) {
-					respostaArr.push( respostaDob )
-				}
-			})
-		}
-	}
-	ctrlRespostas.model.dataArray = respostaArr
-	ctrlRespostas.render()
-}
-ctrlPerguntas.logic.dataObjSaveFunc = async function ( dobPergunta, tableName, pkName ) {
-	dobPergunta.sistema_fk = dal.getSistemaAtivo().id
-	return await dal.saveDataObj( dobPergunta, tableName, pkName )
-}
-ctrlPerguntas.logic.dataObjDelFunc = dal.delDataObj
-
-dal.fetchAll("perguntas").then(rows => {
-	ctrlPerguntas.model.dataArray = rows
-	ctrlPerguntas.render()
-})
-*/
 
 // ---------- COMPONENTE RESPOSTAS
 let ctrlRespostas = new controllerSelectEdit()
@@ -171,31 +134,16 @@ ctrlRespostas.data.fetch = () => dal.fetchAll("respostas")
 ctrlRespostas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'respostas',pkName)
 ctrlRespostas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'respostas',pkName)
 ctrlRespostas.boot()
+
+// ---------- COMPONENTE PERGUNTAS
+let ctrlPerguntas = new controllerSelectEdit()
+ctrlPerguntas.setView( 'slcPergunta','inpPergunta','btSalvarPergunta','btApagarPergunta' )
+ctrlPerguntas.setRefs( 'pergunta','id','sistema_fk',sistemaId )
+ctrlPerguntas.data.fetch = () => dal.fetchAll('perguntas')
+ctrlPerguntas.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'perguntas',pkName)
+ctrlPerguntas.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'perguntas',pkName)
+ctrlPerguntas.boot()
 ctrlPerguntas.updateChild( ctrlRespostas )
-
-/*
-ctrlRespostas.logic.dataObjDelFunc = dal.delDataObj
-ctrlRespostas.logic.dataObjSaveFunc = async function( respostaDob, tableName, pkName  ) {
-	let perguntaDob = ctrlPerguntas.getSelectedDob()
-	if( !perguntaDob || !perguntaDob.id ) {
-		alert( "Selecione uma pergunta primeiro ")
-		return false
-	} else {
-		//respostaDob.sistema_fk = dal.getSistemaAtivo().id
-		respostaDob.pergunta_fk = perguntaDob.id
-		return await dal.saveDataObj( respostaDob, tableName, pkName )
-	}
-}
-*/
-
-// ---------- COMPONENTE OBJETIVOS
-let ctrlObjetivos = new controllerSelectEdit()
-ctrlObjetivos.setView( 'slcObjetivo','inpObjetivo','btSalvarObjetivo','btApagarObjetivo' )
-ctrlObjetivos.setRefs( 'objetivo','id','sistema_fk',sistemaId )
-ctrlObjetivos.data.fetch = () => dal.fetchAll('objetivos')
-ctrlObjetivos.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'objetivos',pkName)
-ctrlObjetivos.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'objetivos',pkName)
-ctrlObjetivos.boot()
 
 // ---------- COMPONENTE CONCLUSOES
 let ctrlConclusoes = new controllerSelectEdit()
@@ -206,7 +154,24 @@ ctrlConclusoes.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'conclusoes',p
 ctrlConclusoes.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'conclusoes',pkName)
 ctrlConclusoes.boot()
 
+// ---------- COMPONENTE OBJETIVOS
+let ctrlObjetivos = new controllerSelectEdit()
+ctrlObjetivos.setView( 'slcObjetivo','inpObjetivo','btSalvarObjetivo','btApagarObjetivo' )
+ctrlObjetivos.setRefs( 'objetivo','id','sistema_fk',sistemaId )
+ctrlObjetivos.data.fetch = () => dal.fetchAll('objetivos')
+ctrlObjetivos.logic.onSave = (dob,pkName) => dal.saveDataObj(dob,'objetivos',pkName)
+ctrlObjetivos.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'objetivos',pkName)
+ctrlObjetivos.boot()
 ctrlObjetivos.updateChild( ctrlConclusoes )
+
+// ------------- COMPONENTE CONDICOES
+compCondicoes = require('./compCondicoes')
+compCondicoes.setView( 'slcCondicao','inpCondicao','btSalvarCondicao','btApagarCondicao' )
+compCondicoes.setCtrl( ctrlObjetivos, ctrlConclusoes, ctrlPerguntas, ctrlRespostas )
+//ctrlConclusoes.hooks.onSelect = () => compCondicoes.atualizarResultado()
+compCondicoes.inicializar( compCondicoes )
+
+
 
 // ---------
 function clickBtFinalizar(){

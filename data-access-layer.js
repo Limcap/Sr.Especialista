@@ -142,12 +142,15 @@ exports.fetchAll = function( tableName ) {
 			case 'conclusoes':
 				qry = `SELECT conclusoes.* FROM conclusoes INNER JOIN objetivos ON conclusoes.objetivo_fk = objetivos.id WHERE objetivos.sistema_fk = ?`
 				break;
+			case '-condicoes':
+				qry = 'SELECT condicoes.*, conclusoes.conclusao, objetivos.objetivo, perguntas.pergunta, respostas.resposta FROM ( condicoes LEFT JOIN conclusoes ON condicoes.conclusao_fk = conclusoes.id ) LEF JOIN objetivos ON conclusoes.objetivo_fk = objetivos.id WHERE objetivos.sistema_fk = ?'
+				break;
 			default:
 				qry = `SELECT * FROM ${tableName} WHERE sistema_fk = ?`
 		}
 		console.log(qry)
 		db.all(qry, [sysAtivo.id], (err, rows) => {
-		if (err) reject(err)
+		if (err) throw (err)
 		else resolve(rows)
 		})
 	})

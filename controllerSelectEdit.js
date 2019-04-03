@@ -19,6 +19,11 @@ let ControllerSelectEdit = function() {
 		onDelete: null,
 		onSelect: null,
 	}
+	this.hooks = {
+		onSelect: null,
+		onSave: null,
+		onDelete: null
+	}
 	this.data = {
 		all: null,
 		current: null,
@@ -168,7 +173,9 @@ ControllerSelectEdit.prototype._changeOpt = function( ev ) {
 	ev.target.controller.updateChild()
 	// executa custom function onSelect 
 	let onSelect = ev.target.controller.logic.onSelect
+	let hookOnSelect = ev.target.controller.hooks.onSelect
 	if( typeof onSelect === 'function' ) onSelect( opt )
+	if( typeof hookOnSelect === 'function' ) hookOnSelect( opt )
 }
 
 
