@@ -74,8 +74,9 @@ ControllerSelectEdit.prototype.setRefs = function( textColumn, pkColumn, fkColum
 
 ControllerSelectEdit.prototype.updateChild = function( child ) {
 	if( child ) this._child = child
-	if( this._child instanceof controllerSelectEdit )
+	if( this._child instanceof controllerSelectEdit ) {
 		this._child.setFkValue( this.getSelectedDobId() )
+	}
 }
 
 
@@ -121,6 +122,7 @@ ControllerSelectEdit.prototype.render = function() {
 	}
 	// adiciona a opção '+' se a Foreing Key nao for null
 	if( this.refs.fkValue != null ) this._insertEmptyOpt()
+	this._callOnChangeHooks()
 }
 
 
@@ -149,31 +151,37 @@ ControllerSelectEdit.prototype._newOption = function( text, value, dob ) {
 
 
 
-ControllerSelectEdit.prototype._insertEmptyOpt = function( focus ) {
-	if( focus === undefined ) focus = true
+ControllerSelectEdit.prototype._insertEmptyOpt = function( select=true ) {
+	//if( select === undefined ) select = true
 	let newOpt = this._newOption( "+", null, null )
 	this.view.selectBox.options.add( newOpt )
-	if( focus ) {
-		//slcBox.selectedIndex = slcBox.length-1
-		newOpt.selected = true
+	if( select ) {
+		newOpt.selected = true //slcBox.selectedIndex = slcBox.length-1
 		this.view.inputField.value = ''
-		//clickOpt( {target:newOpt} )
+		this.view.inputField.focus()
 	}
 }
 
 
 
 ControllerSelectEdit.prototype._changeOpt = function( ev ) {
+	let ctrl = ev.target.controller
 	let slcBox = ev.target
 	let opt = slcBox.selectedOptions[0]
 	let inpBox = slcBox.controller.view.inputField
 	inpBox.value = opt.dob ? opt.text : ""
 	if( !opt.dob ) inpBox.focus()
 	//console.log( 'dob selected:\n' );console.log( opt.dob )
-	ev.target.controller.updateChild()
-	// executa custom function onSelect 
-	let onSelect = ev.target.controller.logic.onSelect
-	let hookOnSelect = ev.target.controller.hooks.onSelect
+	ctrl.updateChild()
+	// chama os hooks de onSelect 
+	ctrl._callOnChangeHooks( opt )
+}
+
+
+
+ControllerSelectEdit.prototype._callOnChangeHooks = function( opt ) {
+	let onSelect = this.logic.onSelect
+	let hookOnSelect = this.hooks.onSelect
 	if( typeof onSelect === 'function' ) onSelect( opt )
 	if( typeof hookOnSelect === 'function' ) hookOnSelect( opt )
 }
@@ -194,8 +202,8 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
 	}
 	let newText = v.inputField.value.trim()
 	let oldText = selected.text
-
-	if( newText.length > 0 ) {		
+	if( newText.length > 0 ) {
+		let success = true
 		// modo 'insert' se a opção '+' estiver selecionada (ela não possui um dob associado)
 		let isInsert = !selected.dob
 		let dob = isInsert ? {} : selected.dob
@@ -208,10 +216,12 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
 			let res = await l.onSave( dob, r.pkColumn )
 			if( res === false ) { // cancela a salvamento
 				dob[r.textColumn] = oldText
+				success = false
 			}
 			else if( res.err ) { // erro no salvamento
 				dob[r.textColumn] = oldText
 				alert( "Ocorreu um erro ao tentar salvar o item" )
+				success = false
 				throw res.err
 			} else { // salvamento bem sucedido
 				console.log( 'ControllerSelectEdit: data saved successfully' )
@@ -219,22 +229,24 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
 				selected.text = res.dob[r.textColumn]
 				if( isInsert ) {
 					ctrl._addDOB( selected.dob )
-					if(ctrl._child) {
-						ctrl._insertEmptyOpt( false )
-						// atualiza a visualizacao do child
-						ctrl.updateChild()
-						// poe o cursor no input do child
-						ctrl._child.view.inputField.focus()
-					} else {
-						ctrl._insertEmptyOpt()
-						ctrl.view.inputField.focus()
-					}
+					// if(ctrl._child) {
+					// 	ctrl._insertEmptyOpt( false )
+					// } else {
+					// 	ctrl._insertEmptyOpt()
+					// 	ctrl.view.inputField.focus()
+					// }
 				}
 			}
 		} else { // não existe função de salvamento
 			selected.dob = dob
 			selected.text = dob[r.textColumn]
 			if( isInsert ) ctrl._insertEmptyOpt()
+		}
+		if( success && isInsert ) {
+			ctrl._insertEmptyOpt( !ctrl._child )
+			ctrl.updateChild()
+			if( ctrl._child ) ctrl._child.view.inputField.focus()
+			ctrl._callOnChangeHooks( selected )
 		}
 	}
 }
@@ -273,6 +285,7 @@ ControllerSelectEdit.prototype._deleteByIndex = function( slcIndex ) {
 	v.selectBox.selectedIndex = Math.min(slcIndex, d.current.length+1)
 	// atualiza o child
 	this._deleteChildDOBsWithFkValue( dob[r.pkColumn] )
+	this._callOnChangeHooks()
 }
 
 
