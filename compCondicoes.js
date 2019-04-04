@@ -1,3 +1,4 @@
+const dal = require('electron').remote.require('./data-access-layer')
 /*
 let objetivoDOB
 let conclusaoDOB
@@ -5,7 +6,6 @@ let btSalvarCondicao = document.getElementById('btSalvarCondicao')
 
 btSalvarCondicao.addEventListener('click',exports.adicionarCondicao)
 */
-
 
 exports.view = {
 	slcBox: null,
@@ -28,7 +28,10 @@ exports.data = {
 	render: []
 }
 
-
+exports.persist = {
+	save: null,
+	delete: null
+}
 
 exports.setView = function( slcBox, inpBox, btnSave, btnDel, btnUp, btnDown ) {
 	this.view.slcBox = document.getElementById(slcBox)
@@ -136,7 +139,7 @@ exports.btnSaveClick = function( ev ) {
 
 
 
-exports.adicionarCondicao = function() {
+exports.adicionarCondicao = async function() {
 	let objetivoDOB = this.ctrl.objetivos.getSelectedDob()
 	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
 	let respostaDOB = this.ctrl.respostas.getSelectedDob()
@@ -145,6 +148,7 @@ exports.adicionarCondicao = function() {
 	let grupo = 0
 	let condicaoOpt  = this.view.slcBox.selectedOptions[0]
 	grupo = condicaoOpt && condicaoOpt.DOB ? condicaoOpt.DOB.grupo : 0
+	console.log({grupo})
 
 	if( !objetivoDOB ) alert('Selecione um objetivo')
 	else if( !conclusaoDOB ) alert('Selecione uma conclusão')
@@ -159,6 +163,14 @@ exports.adicionarCondicao = function() {
 			resposta_fk: respostaDOB.id,
 			grupo: grupo
 		}
+
+		let DALDOB = this.formatDOBtoDAL( newDOB, 'insert' )
+		let res = await this.persist.save( DALDOB,'condicoes','id' )
+
+		newDOB.id = res.lastID
+		console.log({lastID:res.lastID})
+		console.log({newDOB})
+
 		let newOpt = document.createElement('option')
 		newDOB.opt = newOpt
 		newOpt.DOB = newDOB
@@ -169,18 +181,43 @@ exports.adicionarCondicao = function() {
 
 
 
+exports.formatDOBtoDAL = function( DOB={}, mode='update' ) {
+	// É NECESSARIO SEMPRE REMOVER A REFERENCIA CICLICA ENTRE
+	// DOBS E OPTS TANTO PARA GARBAGE COLLECTION COMO PARA NAO
+	// OCORRER PROBLEMA AO ENVIAR PARA UMA FUNCAO DO DAL
+	let DALDOB = {
+		id: DOB.id,
+		conclusao_fk: DOB.conclusao_fk || null,
+		resposta_fk: DOB.resposta_fk || null,
+		grupo: DOB.grupo || 0
+	}
+	if( mode == 'insert'){
+		console.log({mode})
+		delete DALDOB.id
+	}
+	return DALDOB
+}
+
+
+
 exports.btnDelClick = function( ev ) {
+	console.log('\nCLICKED DEL CONDICAO BUTTON')
 	ev.target.controller.apagarCondicao()
 }
 
 
 
-exports.apagarCondicao = function() {
+exports.apagarCondicao = async function() {
+	console.log('\nAPAGARCONDICAO FUNCTION')
 	selectedOpt = this.view.slcBox.selectedOptions[0]
+	console.log({selectedOpt})
 	if( selectedOpt && selectedOpt.DOB ) {
+		let DOB = selectedOpt.DOB
+		let DALDOB = this.formatDOBtoDAL( DOB, 'delete' )
+		let success = await this.apagarExterno( DALDOB )
+		if( !success ) return
 		// remover referências ciclicas para permitir 
 		// garbage collection
-		let DOB = selectedOpt.DOB
 		selectedOpt.DOB = null
 		DOB.opt = null
 		for( let i = 0; i < this.data.all.length; i++ ) {
@@ -194,11 +231,18 @@ exports.apagarCondicao = function() {
 
 
 
+exports.apagarExterno = function( DOB ) {
+	return this.persist.delete( DOB,'condicoes','id' )
+}
+
+
+
 exports.render = function() {
 	// apaga a renderizacao anterior
 	let slcBox = this.view.slcBox
 	slcBox.innerHTML = ''
 	this.view.inpBox.value = ''
+	slcBox.selectedIndex = -1
 	// verifica se existe uma conclusao selecionada
 	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
 	if( !conclusaoDOB ) return
@@ -271,7 +315,7 @@ exports.updateOptText = function( DOB ) {
 			resposta = cResp[i].resposta 
 		}
 	}
-	DOB.opt.text = pergunta + ' = ' + resposta
+	DOB.opt.text = `${pergunta} = ${resposta}`
 }
 
 
@@ -288,18 +332,38 @@ exports.btnDownClick = function( ev ) {
 
 
 
-exports.mudarDeGrupo = function( offset ) {
+exports.mudarDeGrupo = async function( offset ) {
 	let selectedOpt = this.view.slcBox.selectedOptions[0]
 	if( selectedOpt && selectedOpt.DOB ) {
 		let DOB = selectedOpt.DOB
 		let grupo = DOB.grupo
 		let rA = this.data.render
-		let existeGrupoAnterior = !!rA[grupo-1] && rA[grupo-1].length > 0
-		if( offset > 0 && ( grupo == 0 || existeGrupoAnterior ) )
-			DOB.grupo += 1
-		if( offset < 0 && grupo > 0 )
-			DOB.grupo -= 1
-		console.log('grupo: ' + grupo + ' - novo grupo: ' + DOB.grupo)
+		let grupoReal
+		for( let i = 0; i < rA.length; i++ ) {
+			for( let j = 0; j < rA[i].length; j++ ) {
+				if( rA[i][j] == DOB ) {
+					grupoReal = i
+					break
+				}
+			}
+		}
+		let existeGrupoAnterior = !!rA[grupoReal-1] && rA[grupoReal-1].length > 0
+		let existeGrupoPosterior = !!rA[grupoReal+1] && rA[grupoReal+1].length > 0
+		let estouSozinhoNoGrupo = rA[grupoReal].length == 1
+
+		let DALDOB = this.formatDOBtoDAL( DOB,'update' )
+		DALDOB.grupo += offset > 0 ? 1 : -1
+		let res = await this.persist.save( DALDOB,'condicoes','id' )
+		if( res.err ) throw res.err
+
+		if( offset > 0 ){
+			if( existeGrupoPosterior || !estouSozinhoNoGrupo )
+				DOB.grupo += 1
+		}
+		else if( offset < 0 && grupo > 0 ) {
+			DOB.grupo -=1
+		}
+		console.log(`Grupo atual: ${grupo}(${grupoReal}) - Novo grupo: ${DOB.grupo}`)
 	}
 	this.render()
 }

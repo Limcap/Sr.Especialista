@@ -218,12 +218,16 @@ exports.saveDataObj_TEST = async function( dataObj, tableName, pkColumn ) {
 
 exports.saveDataObj = async function( dataObj, tableName, pkColumn ) {
 	isInsert = dataObj.hasOwnProperty( pkColumn )
+	console.log('\n========== DAL SAVE DOB')
+	console.log(`table: ${tableName}`)
+	console.log({dataObj})
 	let res
 	if( isInsert ) {
 		res = await updateDataObj( dataObj, tableName, pkColumn )
 	} else {
 		res = await insertDataObj( dataObj, tableName )
 	}
+	console.log({res})
 /*
 	res = isInsert ?
 		await insertDataObj( dataObj, tableName ) :
@@ -246,6 +250,7 @@ let getDataObjByRowId = function( tableName, rowid ) {
 }
 
 let insertDataObj = function( dataObj, tableName ) {
+	console.log('\n========== DAL INSERT DOB')
 	return new Promise(( resolve, reject )=>{
 		let columns = Object.keys( dataObj ).join( ',' )
 		let values = Object.values( dataObj ).join( '","' )
@@ -257,6 +262,7 @@ let insertDataObj = function( dataObj, tableName ) {
 }
 
 let updateDataObj = function( dataObj, tableName, pkColumn ) {
+	console.log('\n========== DAL UPDATE DOB')
 	return new Promise(( resolve, reject ) => {
 		let pairs = Object.entries( dataObj )
 		pairs = pairs.filter(x => x[0] != pkColumn).map( x => x[0]+' = "'+x[1]+'"' ).join( ',' )
@@ -269,11 +275,15 @@ let updateDataObj = function( dataObj, tableName, pkColumn ) {
 }
 
 exports.delDataObj = function( dataObj, tableName, pkColumn ) {
+	console.log('\n========== DAL DELETE DOB')
+	console.log(`table: ${tableName}`)
+	console.log({dataObj})
 	return new Promise(( resolve, reject ) => {
 		let pkValue = dataObj[pkColumn]
 		let qry = `DELETE FROM ${tableName} WHERE ${pkColumn} = ${pkValue}`
 		db.run( qry, [], function( err ) {
 			if( err ) throw err
+			console.log(`deleted: ${this.changes}`)
 			resolve( {err:err, deleted:this.changes} )
 		})
 	})

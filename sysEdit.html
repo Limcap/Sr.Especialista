@@ -164,11 +164,13 @@ ctrlObjetivos.logic.onDelete = (dob,pkName) => dal.delDataObj(dob,'objetivos',pk
 ctrlObjetivos.boot()
 ctrlObjetivos.updateChild( ctrlConclusoes )
 
-// ------------- COMPONENTE CONDICOES
+// ------------- COMPONENTE CONDICOES ( SINGLETON ESPECIFICO )
 compCondicoes = require('./compCondicoes')
 compCondicoes.setView( 'slcCondicao','inpCondicao','btSalvarCondicao','btApagarCondicao','btUp','btDown' )
 compCondicoes.setCtrl( ctrlObjetivos, ctrlConclusoes, ctrlPerguntas, ctrlRespostas )
 //ctrlConclusoes.hooks.onSelect = () => compCondicoes.atualizarResultado()
+compCondicoes.persist.save = dal.saveDataObj
+compCondicoes.persist.delete = dal.delDataObj
 compCondicoes.inicializar( compCondicoes )
 
 
