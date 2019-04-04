@@ -105,22 +105,22 @@ exports.configViewEvents = function() {
 
 
 
-exports.attachEvent = function (obj,type,handler) {
-	obj.removeEventListener(type,handler)
-	obj.addEventListener(type,handler)
+exports.attachEvent = function ( obj,type,handler ) {
+	obj.removeEventListener( type,handler )
+	obj.addEventListener( type,handler )
 	obj.controller = this
 }
 
 
 
 exports.configConclusaoSelectEvent = function( self ){
-	this.ctrl.conclusoes.hooks.onSelect = () => self.render()
+	this.ctrl.conclusoes.hooks.onSelect = ()=>self.render()
 	//this.ctrl.conclusoes.hooks.onSelect = () => self.atualizarResultado()
 }
 
 
 
-exports.atualizarResultado = function( opt ) {
+exports.atualizarResultado = function() {
 	objetivoDOB = this.ctrl.objetivos.getSelectedDob()
 	conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
 	respostaDOB = this.ctrl.respostas.getSelectedDob()
@@ -195,17 +195,20 @@ exports.apagarCondicao = function() {
 
 
 exports.render = function() {
-	// Renderiza o texto do input (Objetivo = Conclusão)
-	let objetivoDOB = this.ctrl.objetivos.getSelectedDob()
-	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
-	this.view.inpBox.value = objetivoDOB.objetivo + ' = ' + conclusaoDOB.conclusao
-	
-	this.criarRenderArray()
-	let renderArray = this.data.render
+	// apaga a renderizacao anterior
 	let slcBox = this.view.slcBox
 	slcBox.innerHTML = ''
+	this.view.inpBox.value = ''
+	// verifica se existe uma conclusao selecionada
+	let conclusaoDOB = this.ctrl.conclusoes.getSelectedDob()
+	if( !conclusaoDOB ) return
+	// Renderiza o texto do input (Objetivo = Conclusão)
+	let objetivoDOB = this.ctrl.objetivos.getSelectedDob()
+	this.view.inpBox.value = objetivoDOB.objetivo + ' = ' + conclusaoDOB.conclusao
+	
+	this.criarRenderArray( conclusaoDOB.id )
+	let renderArray = this.data.render
 
-	console.log(renderArray)
 	for( let i = 0; i < renderArray.length; i++ ) {
 		grupoArray = renderArray[i]
 		for( let j = 0; j < grupoArray.length; j ++ ) {
@@ -223,8 +226,8 @@ exports.render = function() {
 
 
 
-exports.criarRenderArray = function() {
-	let conclusaoID = this.ctrl.conclusoes.getSelectedDobId()
+exports.criarRenderArray = function( conclusaoID ) {
+	//let conclusaoID = this.ctrl.conclusoes.getSelectedDobId()
 	let renderArray = []
 	// itera por todas as condicoes, procurando as que são referentes
 	// à conclusao selecionada, e as adiciona organizadamente por grupo
@@ -247,7 +250,6 @@ exports.criarRenderArray = function() {
 	//		renderArray.splice(i,1)
 	//}
 	this.data.render = renderArray
-	console.log(this.data.render)
 }
 
 
