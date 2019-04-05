@@ -13,11 +13,12 @@
 		<br>
 		<button id="btFinalizar">Finalizar edição</button>
 	</div>
-	
+
 	<div class="card grow">
-		<h3>Descrição</h3>
+		<h3>Titulo e Descrição</h3>
+		<input type='text' id="inpTitulo" />
 		<textarea id="inpDescricao" size=2 class="grow-1"></textarea>
-		<div><button id="btSalvarDesc">Salvar descrição</button></div>
+		<div><button id="btSalvarDesc">&#10004; Salvar</button></div>
 	</div>
 
 	<div class="card grow">
@@ -119,11 +120,7 @@ sistemDesc = dal.getSistemaAtivo().descricao
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
-
-// ---------- Events
-btFinalizar.addEventListener('click',clickBtFinalizar)
-
-
+inpTitulo.value = dal.getSistemaAtivo().nome
 
 
 // ---------- COMPONENTE RESPOSTAS
@@ -175,6 +172,9 @@ compCondicoes.inicializar( compCondicoes )
 
 
 
+// ---------- Events
+btFinalizar.addEventListener('click',clickBtFinalizar)
+btFinalizar.focus()
 // ---------
 function clickBtFinalizar(){
 	thisWin.loadFile('./sysMain.html')

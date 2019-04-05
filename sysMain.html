@@ -10,17 +10,34 @@
 
 	<div class="card">
 		<h3>Perfil: <span id="txtUsuario">--</span></h3>
+		As informações desse perfil estão disponíveis para qualquer pessoa
+		<br><br>
+		<button id="btSairPerfil">Sair</button>
+		<button id="btSairPerfil">Alterar informacoes</button>
+		
+	</div>
+
+	<div class='card'>
 		<h3>Especialidade: <span id="txtSistema">--</span></h3>
+		<p id="txtDescricao"></p>
 		<br>
-		<button id="btSair">Sair da especialidade</button>
+		<button id="btSair">Sair</button>
+		<button id="btEdit">Editar informações</button>
+	</div>
+
+	<div class="card grow flex-v-1">
+		<h3>Fazer uma consulta</h3>
+		<p>Escolha um ou mais items a determinar</p>
+		<br>
+		<select id='slcObjetivos' size=5 class='grow-1'></select>
+		<div>
+			<button id='btConsultar'>Consultar</button>
+		</div>
 	</div>
 
 	<div class="card">
-		<h3>Descrição:</h3>
-		<p id="txtDescricao"></p>
-		<br>
-		<button id="btConsultar">Fazer consulta</button>
-		<button id="btEdit">Editar informações</button>
+		<h3>Responda às questões abaixo</h3>
+		<div id="formDiv"></div>
 	</div>
 
 </body>
@@ -61,5 +78,89 @@ function clickBtSair(){
 function clickBtEdit() {
 	thisWin.loadFile('./sysEdit.html')
 }
+
+(async function inflarSlcObjetivos() {
+	let slcObjetivos = document.getElementById('slcObjetivos')
+	let objetivosConsultaveis = await dal.fetchAll('objetivos_consultaveis')
+	console.log({objetivosConsultaveis})
+	for( let item of objetivosConsultaveis ) {
+		let opt = document.createElement('option')
+		opt.text = item.objetivo
+		opt.value = item.id
+		slcObjetivos.options.add( opt )
+	}
+})()
+
+let btConsultar = document.getElementById('btConsultar')
+btConsultar.addEventListener('click',carregarConsulta)
+
+let tabelaPerguntas = {}
+let tabelaResultado = {}
+
+async function carregarConsulta() {
+	let res = await dal.fetchAll('condicoes_unrolled')
+
+	for( let con of res ) {
+		tabelaPerguntas[con.pergunta_fk] = { 
+			pergunta: con.pergunta,
+			resposta: null
+		}
+	}
+
+	for( let con of res ) {
+
+		if( !tabelaResultado[`conclusao_${con.conclusao_fk}`] ) {
+			tabelaResultado[`conclusao_${con.conclusao_fk}`] = {}
+		}
+		tabelaResultado[`conclusao_${con.conclusao_fk}`].conclusao_txt = con.conclusao
+		tabelaResultado[`conclusao_${con.conclusao_fk}`].objetivo_id = con.objetivo_fk
+		tabelaResultado[`conclusao_${con.conclusao_fk}`].objetivo_txt = con.objetivo
+		if( !tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`] ) {
+			//console.log(`nao existe grupo_${con.grupo} na conclusao_${con.conclusao_fk}`)
+			tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`] = {}
+		}
+		//console.log(tabelaResultado.conclusao_8)
+		tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`][`pergunta_${con.pergunta_fk}`] = {
+			resposta_certa: con.resposta_fk,
+			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]
+		}
+		/*
+		tabelaResultado[con.conclusao_fk][`grupo_${con.grupo}`] = {}
+		tabelaResultado[con.conclusao_fk][`grupo_${con.grupo}`][`pergunta_${con.pergunta_fk}`] = {
+			resposta_certa: con.resposta_fk,
+			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]			
+		}
+		*/
+		/*
+		if( !tabelaResultado[con.conclusao_fk].grupos[con.grupo] ) {
+			tabelaResultado[con.conclusao_fk].grupos[con.grupo] = {}
+		}
+		if( !tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk] ) {
+			tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk]
+		}
+		tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk] = {
+			resposta_certa: con.resposta_fk,
+			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]
+		}
+		*/
+	}
+
+	console.log({tabelaResultado})
+	renderForm()
+}
+
+let formDiv = document.getElementById('formDiv')
+function renderForm() {
+	
+	let formText = ''
+	for( let p in tabelaPerguntas ) {
+		console.log( p )
+		formText += `${tabelaPerguntas[p].pergunta}<br><select id='pergunta_${p}'></select><br>`
+	}
+	formDiv.innerHTML = formText
+}
+
+
+
 
 </script>
