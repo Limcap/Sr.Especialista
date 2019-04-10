@@ -29,7 +29,7 @@
 		<h3>Fazer uma consulta</h3>
 		<p>Escolha um ou mais items a determinar</p>
 		<br>
-		<select id='slcObjetivos' size=5 class='grow-1'></select>
+		<select multiple id='slcObjetivos' size=5 class='grow-1'></select>
 		<div>
 			<button id='btConsultar'>Consultar</button>
 		</div>
@@ -40,44 +40,52 @@
 		<div id="formDiv"></div>
 	</div>
 
+	<div class="card" id='cardResultados'>
+		<h3>Resultados</h3>
+		<div id="divResultados"></div>
+	</div>
+
 </body>
 
 
 
 <script>
-// ---------- Imports
+// =========================================================================
+// FLUXO: IMPORTS
+// =========================================================================
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
 
 
-// ---------- Elementos do DOM
-const btSair = document.getElementById("btSair")
+
+// =========================================================================
+// FLUXO: INICIALIZACAO DE UI
+// =========================================================================
 const txtUsuario = document.getElementById("txtUsuario")
 const txtSistema = document.getElementById("txtSistema")
 const txtDescricao = document.getElementById("txtDescricao")
-const btEdit = document.getElementById('btEdit') 
+const divResultados = document.getElementById('divResultados')
+const formDiv = document.getElementById('formDiv')
 
-
-// ---------- Eventos
+const btSair = document.getElementById("btSair")
 btSair.addEventListener('click',clickBtSair)
+
+const btEdit = document.getElementById('btEdit') 
 btEdit.addEventListener('click',clickBtEdit)
 
+const btConsultar = document.getElementById('btConsultar')
+btConsultar.addEventListener('click',clickBtConsultar)
 
-// ---------- Init
+
+
+// =========================================================================
+// FLUXO: PREENCHIMENTO DE UI
+// =========================================================================
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
-txtDescricao.innerHTML = dal.getSistemaAtivo().descricao
+txtDescricao.innerHTML = dal.getSistemaAtivo().descricao;
 
-
-// ---------- Funções
-function clickBtSair(){
-	thisWin.loadFile('./sysSelect.html')
-}
-
-function clickBtEdit() {
-	thisWin.loadFile('./sysEdit.html')
-}
 
 (async function inflarSlcObjetivos() {
 	let slcObjetivos = document.getElementById('slcObjetivos')
@@ -91,76 +99,191 @@ function clickBtEdit() {
 	}
 })()
 
-let btConsultar = document.getElementById('btConsultar')
-btConsultar.addEventListener('click',carregarConsulta)
 
+
+// =========================================================================
+// FLUXO: MAIN
+// =========================================================================
+let tabelaConclusao = {}
 let tabelaPerguntas = {}
-let tabelaResultado = {}
 
-async function carregarConsulta() {
-	let res = await dal.fetchAll('condicoes_unrolled')
 
-	for( let con of res ) {
-		tabelaPerguntas[con.pergunta_fk] = { 
-			pergunta: con.pergunta,
-			resposta: null
-		}
-	}
 
-	for( let con of res ) {
-
-		if( !tabelaResultado[`conclusao_${con.conclusao_fk}`] ) {
-			tabelaResultado[`conclusao_${con.conclusao_fk}`] = {}
-		}
-		tabelaResultado[`conclusao_${con.conclusao_fk}`].conclusao_txt = con.conclusao
-		tabelaResultado[`conclusao_${con.conclusao_fk}`].objetivo_id = con.objetivo_fk
-		tabelaResultado[`conclusao_${con.conclusao_fk}`].objetivo_txt = con.objetivo
-		if( !tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`] ) {
-			//console.log(`nao existe grupo_${con.grupo} na conclusao_${con.conclusao_fk}`)
-			tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`] = {}
-		}
-		//console.log(tabelaResultado.conclusao_8)
-		tabelaResultado[`conclusao_${con.conclusao_fk}`][`grupo_${con.grupo}`][`pergunta_${con.pergunta_fk}`] = {
-			resposta_certa: con.resposta_fk,
-			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]
-		}
-		/*
-		tabelaResultado[con.conclusao_fk][`grupo_${con.grupo}`] = {}
-		tabelaResultado[con.conclusao_fk][`grupo_${con.grupo}`][`pergunta_${con.pergunta_fk}`] = {
-			resposta_certa: con.resposta_fk,
-			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]			
-		}
-		*/
-		/*
-		if( !tabelaResultado[con.conclusao_fk].grupos[con.grupo] ) {
-			tabelaResultado[con.conclusao_fk].grupos[con.grupo] = {}
-		}
-		if( !tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk] ) {
-			tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk]
-		}
-		tabelaResultado[con.conclusao_fk].grupos[con.grupo][con.pergunta_fk] = {
-			resposta_certa: con.resposta_fk,
-			resposta_fornecida: tabelaPerguntas[con.pergunta_fk]
-		}
-		*/
-	}
-
-	console.log({tabelaResultado})
-	renderForm()
+// =========================================================================
+// FUNCOES DE EVENTOS DE UI
+// =========================================================================
+function clickBtSair(){
+	thisWin.loadFile('./sysSelect.html')
 }
 
-let formDiv = document.getElementById('formDiv')
-function renderForm() {
-	
+function clickBtEdit() {
+	thisWin.loadFile('./sysEdit.html')
+}
+
+function changeResposta(perguntaID, respostaID) {
+	responder( perguntaID, respostaID )
+}
+
+function clickBtConsultar() {
+	carregarConsulta()
+}
+
+
+
+// =========================================================================
+// FUNCOES DE PROCESSAMENTO
+// =========================================================================
+async function carregarConsulta() {
+	await criarTabelas()
+	renderizarPerguntas()
+}
+
+
+
+async function fetchCondicoesUnrolled() {
+	let objetivosIDs = []
+	for( let opt of slcObjetivos.selectedOptions ) {
+		objetivosIDs.push( opt.value )
+	}
+	return await dal.fetchAll('condicoes_unrolled',`objetivo_fk IN (${objetivosIDs.join(',')})`)
+}
+
+
+
+async function criarTabelas() {
+	const condicoesUnrolled = await fetchCondicoesUnrolled()
+	tabelaConclusao = {}
+	tabelaPerguntas = {}
+
+	// criando a o objeto tabela de perguntas
+	for( let con of condicoesUnrolled ) {
+		if( !tabelaPerguntas[con.pergunta_fk] ) {
+			tabelaPerguntas[con.pergunta_fk] = {
+				resposta_usuario: null,
+				respostas_possiveis: {},
+				objetivos: {}
+			}
+		}
+		else {
+			tabelaPerguntas[con.pergunta_fk].pergunta_txt = con.pergunta
+			tabelaPerguntas[con.pergunta_fk].objetivos[con.objetivo_fk] = con.objetivo
+		}
+	}
+
+	// adicionando respostas possiveis ao objeto tabela de perguntas
+	let perguntasIDs = Object.keys(tabelaPerguntas).join(',')
+	let respostasQres = await dal.fetchAll('respostas', `pergunta_fk IN (${perguntasIDs})`)
+	for( let row of respostasQres ) {
+		console.log({respostasQres})
+		tabelaPerguntas[row.pergunta_fk].respostas_possiveis[row.id] = row.resposta
+	}
+
+	// construindo o objeto tabela de conclusoes
+	let tc, g
+	for( let con of condicoesUnrolled ) {
+		if( !tabelaConclusao[con.conclusao_fk] ) {
+			tabelaConclusao[con.conclusao_fk] = {}
+		}
+		tc = tabelaConclusao[con.conclusao_fk]
+		tc.conclusao_txt = con.conclusao
+		tc.objetivo_id = con.objetivo_fk
+		tc.objetivo_txt = con.objetivo
+		if( !tc.grupos ) tc.grupos = {}
+		if( !tc.grupos[con.grupo] ) tc.grupos[con.grupo] = {}
+		g = tc.grupos[con.grupo]
+		g[`pergunta_${con.pergunta_fk}`] = {
+			resposta_certa: con.resposta_fk,
+			tabelaPerguntas: tabelaPerguntas[con.pergunta_fk]
+		}
+	}
+
+	return
+}
+
+
+
+function renderizarPerguntas() {
 	let formText = ''
 	for( let p in tabelaPerguntas ) {
 		console.log( p )
-		formText += `${tabelaPerguntas[p].pergunta}<br><select id='pergunta_${p}'></select><br>`
+		formText += `${tabelaPerguntas[p].pergunta_txt}<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
+		let respostas = tabelaPerguntas[p].respostas_possiveis
+		let options = ''
+		for( let rID in respostas ) {
+			options += `<option value='${rID}'>${respostas[rID]}</option>`
+		}
+		formText += `<option value=null> -- </option> ${options}</select><br>`
 	}
 	formDiv.innerHTML = formText
 }
 
 
 
+function responder( perguntaID, respostaID ) {
+	atualizarTabelaPerguntas( perguntaID, respostaID )
+	atualizarCardResultados()
+}
 
+
+
+function atualizarTabelaPerguntas( perguntaID,respostaID ) {
+	//alert(`${perguntaID} -  ${respostaID}`)
+	tabelaPerguntas[perguntaID].resposta_usuario = respostaID
+}
+
+
+
+function atualizarCardResultados() {
+	let concText = ''
+	for( let cID in tabelaConclusao ) {
+		let conc = tabelaConclusao[cID]
+		let grupoMatch = true
+		for( let gID in conc.grupos ) {
+			for( p in conc.grupos[gID] ) {
+				let perg = conc.grupos[gID][p]
+				if( perg.resposta_certa != perg.tabelaPerguntas.resposta_usuario ) {
+					grupoMatch = false
+				}
+			}
+		}
+		if( grupoMatch ) { 
+			//alert( conc.objetivo_txt + '  = ' + conc.conclusao_txt )
+			concText += `<br><p><b>${conc.objetivo_txt}:</b><br>${conc.conclusao_txt}</p>`
+		}
+	}
+	concText = concText ? concText : '<br><p>Nenhuma conclusão possível</p>'
+	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>' + concText
+}
+
+/*
+TESTE DO RowsToObject
+
+let RowsToObject = require('./RowsToObject')
+let modelObject = {
+	objetivo__objetivo_fk: {
+		nome__: 'objetivo',
+		conclusao__conclusao_fk: {
+			nome__: 'conclusao',
+			grupo__grupo: {
+				pergunta__pergunta_fk: {
+					nome__: 'pergunta',
+					resposta__: {
+						nome__: 'resposta',
+						certa__: 'resposta_fk',
+						usuario__: ['pegarResposta','resposta_fk',]
+					}
+				}
+			}
+		}
+	}
+}
+
+dal.fetchAll('condicoes_unrolled')
+.then(rows => {
+	let obj = RowsToObject.formatToModel( rows, modelObject )
+	console.log({obj})
+})
+*/
+
+//rows=[[]], modelObjetc={}, modelFunctions={}, newObj={}, filters=[[]], maxDepth=10
 </script>

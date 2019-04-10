@@ -132,7 +132,7 @@ getPerfilPublico = function(callback) {
 /**
  * Busca todos os registro de uma tabela selecionada do sistema ativo
  */
-exports.fetchAll = function( tableName ) {
+exports.fetchAll = function( tableName, where=null ) {
 	return new Promise((resolve, reject) => {
 		let qry
 		switch( tableName ) {
@@ -148,6 +148,7 @@ exports.fetchAll = function( tableName ) {
 			default:
 				qry = `SELECT * FROM ${tableName} WHERE sistema_fk = ?`
 		}
+		qry += where ? ` AND ${where}` : ''
 		console.log(qry)
 		db.all(qry, [sysAtivo.id], (err, rows) => {
 		if (err) throw (err)
