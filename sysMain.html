@@ -12,20 +12,23 @@
 		<h3>Perfil: <span id="txtUsuario">--</span></h3>
 		As informações desse perfil estão disponíveis para qualquer pessoa
 		<br><br>
-		<button id="btSairPerfil">Sair</button>
-		<button id="btSairPerfil">Alterar informacoes</button>
-		
+		<div>
+			<button id="btSairPerfil">Sair</button>		
+		</div>
 	</div>
 
 	<div class='card'>
 		<h3>Especialidade: <span id="txtSistema">--</span></h3>
 		<p id="txtDescricao"></p>
 		<br>
-		<button id="btSair">Sair</button>
-		<button id="btEdit">Editar informações</button>
+		<div>
+			<button id="btSairEspecialidade">Sair</button>
+			<button id="btEdit">Editar informações</button>
+		</div>
+
 	</div>
 
-	<div class="card grow flex-1col">
+	<div class="card grow">
 		<h3>Fazer uma consulta</h3>
 		<p>Escolha um ou mais items a determinar</p>
 		<br>
@@ -36,12 +39,12 @@
 		</div>
 	</div>
 
-	<div class="card flex-1col" id='cardPerguntas' style='display: none'>
+	<div class="card" id='cardPerguntas' style='display: none'>
 		<h3>Responda às questões abaixo</h3>
 		<div id="formDiv"></div>
 	</div>
 
-	<div class="card flex-1col" id='cardResultados' style='display: none'>
+	<div class="card" id='cardResultados' style='display: none'>
 		<h3>Resultados</h3>
 		<div id="divResultados"></div>
 	</div>
@@ -80,8 +83,11 @@ const formDiv = document.getElementById('formDiv')
 const cardPerguntas = document.getElementById('cardPerguntas')
 const cardResultado = document.getElementById('cardResultados')
 
-const btSair = document.getElementById("btSair")
-btSair.addEventListener('click',clickBtSair)
+const btSairPerfil = document.getElementById("btSairPerfil")
+btSairPerfil.addEventListener('click',clickBtSairPerfil)
+
+const btSairEspecialidade = document.getElementById("btSairEspecialidade")
+btSairEspecialidade.addEventListener('click',clickBtSairEspecialidade)
 
 const btEdit = document.getElementById('btEdit') 
 btEdit.addEventListener('click',clickBtEdit)
@@ -119,7 +125,11 @@ btFecharConsulta.disabled = true;
 // =========================================================================
 // FUNCOES DE EVENTOS DA GUI
 // =========================================================================
-function clickBtSair(){
+function clickBtSairPerfil(){
+	thisWin.loadFile('./sysLogin.html')
+}
+
+function clickBtSairEspecialidade(){
 	thisWin.loadFile('./sysSelect.html')
 }
 

@@ -11,14 +11,18 @@
 		<h3>Perfil: <span id="txtUsuario">--</span></h3>
 		<h3>Especialidade: <span id="txtSistema">--</span></h3>
 		<br>
-		<button id="btFinalizar">Finalizar edição</button>
+		<div>
+			<button id="btFinalizar">Finalizar edição</button>
+		</div>
 	</div>
 
 	<div class="card grow">
 		<h3>Titulo e Descrição</h3>
 		<input type='text' id="inpTitulo" />
 		<textarea id="inpDescricao" size=2 class="grow-1"></textarea>
-		<div><button id="btSalvarDesc">&#10004; Salvar</button></div>
+		<div>
+			<button id="btSalvarDesc">&#10004; Salvar</button>
+		</div>
 	</div>
 
 	<div class="card grow">
@@ -73,12 +77,8 @@
 
 	<div class="card grow">
 		<h3>Condições</h3>
-		<div class='flex-1col'>
-			<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
-		</div>
-		<div id='Resultado'>
-			SE
-		</div>
+		<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
+		<div>SE</div>
 		<select id="slcCondicao" class="grow-1" size=5></select>
 		<div>
 			<button id="btSalvarCondicao">Incluir par pergunta/resposta</button>
