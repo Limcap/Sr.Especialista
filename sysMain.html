@@ -89,6 +89,8 @@ btEdit.addEventListener('click',clickBtEdit)
 const btConsultar = document.getElementById('btConsultar')
 btConsultar.addEventListener('click',clickBtConsultar)
 
+const btFecharConsulta = document.getElementById('btFecharConsulta')
+btFecharConsulta.addEventListener('click',clickBtFecharConsulta)
 
 
 // =========================================================================
@@ -98,6 +100,7 @@ txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 txtDescricao.innerHTML = dal.getSistemaAtivo().descricao;
 
+btFecharConsulta.disabled = true;
 
 (async function inflarSlcObjetivos() {
 	let slcObjetivos = document.getElementById('slcObjetivos')
@@ -132,7 +135,15 @@ function changeResposta(perguntaID, respostaID) {
 async function clickBtConsultar() {
 	await criarTabelas()
 	renderizarPerguntas()
+	btFecharConsulta.disabled = false
 }
+
+function clickBtFecharConsulta() {
+	cardPerguntas.style.display = 'none'
+	cardResultados.style.display = 'none'
+	btFecharConsulta.disabled = true
+}
+
 
 
 
@@ -193,7 +204,7 @@ function atualizarCardResultados() {
 	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>'
 	divResultados.innerHTML += resultadoTexto
 	cardResultado.style.display = 'flex'
-	console.log({resultadoObj})
+	//console.log({resultadoObj})
 }
 
 
@@ -234,7 +245,7 @@ async function criarTabelas() {
 	let perguntasIDs = Object.keys(tabelaPerguntas).join(',')
 	let respostasQres = await dal.fetchAll('respostas', `pergunta_fk IN (${perguntasIDs})`)
 	for( let row of respostasQres ) {
-		console.log({respostasQres})
+		//console.log({respostasQres})
 		tabelaPerguntas[row.pergunta_fk].respostas_possiveis[row.id] = row.resposta
 	}
 
