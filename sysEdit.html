@@ -23,6 +23,31 @@
 
 	<div class="card grow">
 		<section class='section-73'>
+			<h3>Objetivos</h3>
+			<h3>Conclusões</h3>
+		</section>
+		<section class='section-73 grow-1'>
+			<select id='slcObjetivo' size=5></select>
+			<select id='slcConclusao' size=5></select>
+		</section>
+		<section class='section-73'>
+			<input id='inpObjetivo' />
+			<input id='inpConclusao' />
+		</section>
+		<section class='section-73'>
+			<div>
+				<button id="btSalvarObjetivo">&#10004;</button>
+				<button id="btApagarObjetivo">&#10008;</button>
+			</div>
+			<div>
+				<button id="btSalvarConclusao">&#10004;</button>
+				<button id="btApagarConclusao">&#10008;</button>
+			</div>
+		</section>
+	</div>
+	
+	<div class="card grow">
+		<section class='section-73'>
 			<h3>Perguntas</h3>
 			<h3>Respostas</h3>
 		</section>
@@ -47,46 +72,21 @@
 	</div>
 
 	<div class="card grow">
-			<section class='section-73'>
-				<h3>Objetivos</h3>
-				<h3>Conclusões</h3>
-			</section>
-			<section class='section-73 grow-1'>
-				<select id='slcObjetivo' size=5></select>
-				<select id='slcConclusao' size=5></select>
-			</section>
-			<section class='section-73'>
-				<input id='inpObjetivo' />
-				<input id='inpConclusao' />
-			</section>
-			<section class='section-73'>
-				<div>
-					<button id="btSalvarObjetivo">&#10004;</button>
-					<button id="btApagarObjetivo">&#10008;</button>
-				</div>
-				<div>
-					<button id="btSalvarConclusao">&#10004;</button>
-					<button id="btApagarConclusao">&#10008;</button>
-				</div>
-			</section>
+		<h3>Condições</h3>
+		<div class='flex-v-1'>
+			<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
 		</div>
-
-	<div class="card grow">
-			<h3>Condições</h3>
-			<div class='flex-v-1'>
-				<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
-			</div>
-			<div id='Resultado'>
-				SE
-			</div>
-			<select id="slcCondicao" class="grow-1" size=5></select>
-			<div>
-				<button id="btSalvarCondicao">Incluir par pergunta/resposta</button>
-				<button id="btApagarCondicao">&#10008;</button>
-				&nbsp;&nbsp;&nbsp;&nbsp;
-				<button id='btUp'>&#9650;</button>
-				<button id='btDown'>&#9660;</button><!--   -->
-			</div>
+		<div id='Resultado'>
+			SE
+		</div>
+		<select id="slcCondicao" class="grow-1" size=5></select>
+		<div>
+			<button id="btSalvarCondicao">Incluir par pergunta/resposta</button>
+			<button id="btApagarCondicao">&#10008;</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<button id='btUp'>&#9650;</button>
+			<button id='btDown'>&#9660;</button><!--   -->
+		</div>
 	</div>
 
 </body>
