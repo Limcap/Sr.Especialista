@@ -11,7 +11,7 @@ dal.conectarDb()
 let win
 function createWindow () {
   win = new BrowserWindow({ width: 800, height: 600 })
-  win.loadFile('login.html')
+  win.loadFile('sysLogin.html')
   //win.webContents.openDevTools()
 }
 app.on('ready', createWindow)
