@@ -106,7 +106,7 @@ const thisWin = remote.getCurrentWindow()
 const txtUsuario = document.getElementById("txtUsuario")
 const txtSistema = document.getElementById("txtSistema")
 const btFinalizar = document.getElementById('btFinalizar')
-
+const inpTitulo = document.getElementById('inpTitulo')
 const inpDescricao = document.getElementById("inpDescricao")
 const btSalvarDesc = document.getElementById("btSalvarDesc")
 
@@ -121,6 +121,8 @@ txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
 inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
 inpTitulo.value = dal.getSistemaAtivo().nome
+
+// --------------
 
 
 // ---------- COMPONENTE RESPOSTAS
@@ -178,6 +180,28 @@ btFinalizar.focus()
 // ---------
 function clickBtFinalizar(){
 	thisWin.loadFile('./sysMain.html')
+}
+
+
+btSalvarDesc.addEventListener('click',clickBtSavarDesc)
+function clickBtSavarDesc() {
+	salvarDesc()
+}
+
+
+async function salvarDesc() {
+	let currentSisDOB = dal.getSistemaAtivo()
+	let sistemaDOB = {
+		id: currentSisDOB.id,
+		nome: inpTitulo.value,
+		descricao: inpDescricao.value
+	}
+	let res = await dal.saveDataObj( sistemaDOB, 'sistemas', 'id' )
+	console.log( res )
+	if( !res.err ) {
+		currentSisDOB.nome = inpTitulo.value
+		currentSisDOB.descricao = inpDescricao.value
+	}
 }
 </script>
 </html>

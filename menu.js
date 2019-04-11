@@ -16,8 +16,21 @@ const template = [
 	{
 		label: 'DevTools',
 		click() { thisWin.webContents.toggleDevTools() }
+	},
+	{
+		label: 'Zoom',
+		submenu: [
+			{ label: 'Aumentar', role: 'zoomin', accelerator: 'CmdOrCtrl+]', },
+			{ label: 'Reduzir', role:'zoomout', accelerator: 'CmdOrCtrl+[', },
+			{ role: 'resetzoom' }
+		]
 	}
 ]
 
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
+
+
+exports.strings = {
+	titulo: 'Sr. Especialista'
+}

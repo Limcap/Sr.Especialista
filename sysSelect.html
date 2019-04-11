@@ -12,18 +12,33 @@
 		<h3>Perfil: <span id="txtUsuario">Usuario</span></h3>
 		<br>
 		<button id="btSair">Sair do perfil</button>	
+		<button id="btDeletarPerfil" style='float:right'>&#10008; Deletar Perfil</button>
 	</div>	
 
 	<div class="card">
 		<h3>Selecione uma especialidade</h3>
 		<br>
 		<select id="slcSistemas" size=10 style="width:100%"></select>
-		<button id="btOk">Ok</button>
+		<button id="btOk">Entrar</button>
+		<button id="btDeletarSistema" style='float:right'>&#10008; Deletar Sistema</button>
 	</div>
 	
-	<div class="card">
-		<a href="#" id="btAdicionar">Criar uma nova especialidade</a>
-	</div>>
+	<div class="card" id='cardLinkCriar'>
+		<a href="#" id="btLinkCriar">Criar uma nova especialidade</a>
+	</div>
+
+	<div class="card grow" id='cardCriar' style='display: none'>
+		<h3>Criar uma nova especialidade</h3>
+		<br>
+		<label>Titulo</label>
+		<input type='text' id="inpTitulo" />
+		<label>Descricao</label>
+		<textarea id="inpDescricao" size=2 class="grow-1"></textarea>
+		<div>
+			<button id="btSalvar">&#10004; Salvar</button>
+			<button id="btCancelar">&#10008; Cancelar</button>
+		</div>
+	</div>
 	
 	<div id="divMensagem"></div>
 	
@@ -36,28 +51,78 @@
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
+const menu = require('./menu.js')
 
 
 // ---------- Elementos do DOM
 const slcSistemas = document.getElementById("slcSistemas")
 const btSair = document.getElementById("btSair")
 const btOk = document.getElementById("btOk")
+const btLinkCriar = document.getElementById('btLinkCriar')
+const btSalvar = document.getElementById('btSalvar')
+const btCancelar = document.getElementById('btCancelar')
+const btDeletarSistema = document.getElementById('btDeletarSistema')
+const btDeletarPerfil = document.getElementById('btDeletarPerfil')
 
+const cardLinkCriar = document.getElementById('cardLinkCriar')
+const cardCriar = document.getElementById('cardCriar')
+
+const inpTitulo = document.getElementById('inpTitulo')
+const inpDescricao = document.getElementById('inpDescricao')
 
 // ---------- Eventos
 btSair.addEventListener('click',sair)
 btOk.addEventListener('click',clickBtOk)
+btLinkCriar.addEventListener('click',clickBtLinkCriar)
+btCancelar.addEventListener('click',clickBtCancelar)
+btSalvar.addEventListener('click',clickBtSalvar)
+btDeletarSistema.addEventListener('click',clickBtDeletarSistema)
+btDeletarPerfil.addEventListener('click',clickBtDeletarPerfil)
 
 
 // ---------- Inicialização
+if( dal.getPerfilAtivo().id <= 1 ) {
+	btDeletarPerfil.style.display = 'none'
+}
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 preencher()
+
+
+// ---------- Funcoes de eventos
+function clickBtOk() {
+	if(slcSistemas.value) {
+		dal.setSistemaAtivo(slcSistemas.options[slcSistemas.value-1].obj)
+		thisWin.loadFile('./sysMain.html')
+	}
+}
+
+function clickBtLinkCriar() {
+	toggleCriarCard(1)
+}
+
+function clickBtCancelar() {
+	toggleCriarCard(0)
+}
+
+function clickBtSalvar() {
+	salvarNovoSistema()
+}
+
+function clickBtDeletarSistema() {
+	deletarSistema()
+}
+
+function clickBtDeletarPerfil() {
+	deletarPerfil()
+}
+
 
 
 // ---------- Funções
 
 function preencher() {
 	//console.log(dal.perfilAtivo)
+	slcSistemas.innerHTML = ''
 	dal.getSistemas()
 	.then(rows => {
 		rows.forEach(row => {
@@ -76,10 +141,76 @@ function sair(){
 }
 
 
-function clickBtOk() {
-	if(slcSistemas.value) {
-		dal.setSistemaAtivo(slcSistemas.options[slcSistemas.value-1].obj)
-		thisWin.loadFile('./sysMain.html')
+function toggleCriarCard( state ) {
+	cardLinkCriar.style.display = state == 0 ? 'flex' : 'none'
+	cardCriar.style.display = state == 0 ? 'none' : 'flex'
+}
+
+
+async function salvarNovoSistema() {
+	if( inpTitulo.value.trim().length == 0 ) {
+		alert( 'Digite um nome para a nova especialidade' )
+		return
+	}
+	let DOB = {
+		nome: inpTitulo.value,
+		descricao: inpDescricao.value,
+		usuario_fk: dal.getPerfilAtivo().id
+	}
+	let res = await dal.saveDataObj( DOB, 'sistemas', 'id' )
+	if( res.err ) {
+		let msg = ''
+		if( res.err.errno = 19 ) {
+			msg = 'Um sistema com esse mesmo nome já existe. Escolha um outro nome para salvar'
+		}
+		else {
+			msg = res.err.error
+		}
+		alert( msg )
+	}
+	else {
+		thisWin.reload()
+	}
+}
+
+
+async function deletarSistema() {
+	if( slcSistemas.selectedIndex > 1 )
+	dob = {
+		id: slcSistemas.value
+	}
+	let yn = confirm( `Deseja mesmo deletar o sistema "${slcSistemas.selectedOptions[0].text}"?\nTodas as informações relacionadas a ele tambem serao deletadas`)
+	if( yn ) {
+		let res = await dal.delDataObj( dob, 'sistemas', 'id' )
+		console.log( res )
+		if( !res.err ) {
+			preencher()
+		}
+		else {
+			alert( res.err.error )
+		}
+	}
+}
+
+
+async function deletarPerfil() {
+	let id = dal.getPerfilAtivo().id
+	let nome = dal.getPerfilAtivo().nome
+	if( id != 0 )
+	dob = {
+		id: id
+	}
+	let yn = confirm( `Deseja mesmo deletar o Perfil "${nome}"?\nTodas as especialidades relacionadas a ele tambem serao deletadas`)
+	if( yn ) {
+		let res = await dal.delDataObj( dob, 'usuarios', 'id' )
+		console.log( res )
+		if( !res.err ) {
+			alert( `Este perfil foi apagado!. Retornaremos a tela de Login`)
+			sair()
+		}
+		else {
+			alert( res.err.error )
+		}
 	}
 }
 

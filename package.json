@@ -1,7 +1,7 @@
 {
-  "name": "sisespecialista",
+  "name": "sr.especialista",
   "version": "1.0.0",
-  "description": "Sistema Especialista",
+  "description": "Criador de Sistema Especialista",
   "main": "main.js",
   "scripts": {
     "start": "electron .",

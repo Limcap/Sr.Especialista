@@ -8,21 +8,183 @@
 	<div class="card">
 		<h1>Sr. Especialista</h1>
 	</div>
-	<div class="card">
+	<div class="card grow" id='cardLogin'>
+		<h3>Fazer Login</h3>
+		<br>
 		<div>Perfil:</div>
 		<div><input type="text" id="inpLogin" placeholder="P&uacute;blico"></div>
 		
 		<div>Senha:</div>
 		<div><input type="password" id="inpSenha" placeholder="******"></div>
 		
-		<button id="btEntrar">Entrar</button>
+		<div><button id="btEntrar">Entrar</button></div>
 		<div id="divMensagem"></div>
 	</div>
-	<div class="card">
-		<a href="#" id="btNovoPerfil">Criar um perfil particular</a>
+
+
+	<div class="card" id='cardLinkCriar'>
+		<a href="#" id="btLinkCriar">Criar um perfil particular</a>
 	</div>
+
+
+	<div class="card grow" id='cardCriar' style='display: none'>
+			<h3>Criar uma perfil particular</h3>
+			<br>
+			<label>Nome do perfil</label>
+			<div><input type='text' id="inpNome" /></div>
+			<label>Senha</label>
+			<div><input type='password' id="inpSenha1" /></div>
+			<label>Confirme a senha</label>
+			<div><input type='password' id="inpSenha2" /></div>
+			<div>
+				<button id="btSalvar">&#10004; Registrar</button>
+				<button id="btCancelar">&#10008; Cancelar</button>
+			</div>
+		</div>
+
+
 </body>
 
+
+
+
 <script>
-	require("./login-view.js");
+//const BrowserWindow = require('electron').remote.BrowserWindow
+const { remote } = require('electron')
+const dal = remote.require('./data-access-layer.js')
+const thisWin = remote.getCurrentWindow()
+const menu = require('./menu.js')
+
+
+// ---------- Elementos da DOM
+const inpLogin = document.getElementById('inpLogin')
+const inpSenha = document.getElementById('inpSenha')
+const btEntrar = document.getElementById('btEntrar')
+const btNovoPerfil = document.getElementById('btNovoPerfil')
+const divMensagem = document.getElementById('divMensagem')
+
+const btLinkCriar = document.getElementById('btLinkCriar')
+const btSalvar = document.getElementById('btSalvar')
+const btCancelar = document.getElementById('btCancelar')
+//const btDeletar = document.getElementById('btDeletar')
+
+const cardLinkCriar = document.getElementById('cardLinkCriar')
+const cardCriar = document.getElementById('cardCriar')
+const cardLogin = document.getElementById('cardLogin')
+
+const inpNome = document.getElementById('inpNome')
+const inpSenha1 = document.getElementById('inpSenha1')
+const inpSenha2 = document.getElementById('inpSenha2')
+
+
+// ---------- Eventos
+btEntrar.addEventListener('click',tentarLogar)
+//btNovoPerfil.addEventListener('click',listarUsuarios)
+btLinkCriar.addEventListener('click',clickBtLinkCriar)
+btCancelar.addEventListener('click',clickBtCancelar)
+btSalvar.addEventListener('click',clickBtSalvar)
+//btDeletar.addEventListener('click',clickBtDeletar)
+
+// ---------- Funcoes de Eventos
+function clickBtLinkCriar() {
+	toggleCriarCard(1)
+}
+
+function clickBtCancelar() {
+	toggleCriarCard(0)
+}
+
+function clickBtSalvar() {
+	salvarNovoPerfil()
+}
+
+function clickBtDeletar() {
+	deletarSistema()
+}
+
+
+// ---------- Funções
+function listarUsuarios() {
+	dal.getUsuarios((rows)=>{
+		rows = JSON.stringify(rows)
+		divMensagem.innerHTML = rows
+	})
+}
+
+
+function isPerfilPublico() {
+	if(inpLogin.value.trim() == "")
+	return true
+}
+
+
+function tentarLogar() {
+	credenciais = {
+		login: inpLogin.value.trim(),
+		senha: inpSenha.value.trim()
+	}
+	dal.logar(credenciais)
+	.then(userObj =>{
+		if(userObj) {
+			divMensagem.innerHTML=`Perfil encontrado: ${userObj.nome}`
+			thisWin.loadFile('./sysSelect.html')
+		}
+		else
+			divMensagem.innerHTML="Credencial não existente"
+	})
+	/*
+	dal.coincidirUsuario(credenciais, (retorno) => {
+		if(!retorno) {
+			divMensagem.innerHTML="Credencial não existente"
+		}
+		else {
+			console.log(`user id = ${retorno.id} .`)
+		}
+	})
+	*/
+	//thisWin.loadFile('./selectSys.html')
+}
+
+
+
+function toggleCriarCard( state ) {
+	cardLinkCriar.style.display = state == 0 ? 'flex' : 'none'
+	//cardLogin.style.display = state == 0 ? 'flex' : 'none'
+	cardCriar.style.display = state == 0 ? 'none' : 'flex'
+}
+
+
+async function salvarNovoPerfil() {
+	if( inpNome.value.length == 0 ) {
+		alert( 'Preencha o campo Nome' )
+	}
+	else if( inpSenha1.value.length == 0 ) {
+		alert( 'Preencha o campo Senha' )
+	}
+	else if( inpSenha1.value != inpSenha2.value ) {
+		alert( 'A confirmacao da senha nao é igual a senha' )
+	}
+	else {
+		let DOB = {
+			nome: inpNome.value,
+			senha: inpSenha1.value
+		}
+	
+		let res = await dal.saveDataObj( DOB, 'usuarios', 'id' )
+		if( res.err ) {
+			let msg = ''
+			if( res.err.errno = 19 ) {
+				msg = 'Um perfil com esse mesmo nome já existe. Escolha um outro nome para o perfil'
+			}
+			else {
+				msg = res.err.error
+			}
+			alert( msg )
+		}
+		else {
+			alert( 'Perfil criardo!' )
+			thisWin.reload()
+		}
+	}
+}
 </script>
