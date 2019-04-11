@@ -45,7 +45,7 @@
 			</div>
 		</section>
 	</div>
-	
+
 	<div class="card grow">
 		<section class='section-73'>
 			<h3>Perguntas</h3>
@@ -94,7 +94,9 @@
 
 
 <script>
-// ---------- Imports
+// =========================================================================
+// REQUIRE
+// =========================================================================
 const menu = require('./menu.js')
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
@@ -102,29 +104,34 @@ const controllerSelectEdit = require('./controllerSelectEdit.js')
 const thisWin = remote.getCurrentWindow()
 
 
-// ---------- Elementos do DOM
-const txtUsuario = document.getElementById("txtUsuario")
-const txtSistema = document.getElementById("txtSistema")
-const btFinalizar = document.getElementById('btFinalizar')
-const inpTitulo = document.getElementById('inpTitulo')
-const inpDescricao = document.getElementById("inpDescricao")
-const btSalvarDesc = document.getElementById("btSalvarDesc")
 
-
-// ---------- INICIALIZAÇOES
+// =========================================================================
+// ESTADO INICIAL DO PROCESSAMENTO
+// =========================================================================
 usuarioNome = dal.getPerfilAtivo().nome
 sistemaNome = dal.getSistemaAtivo().nome
 sistemaId = dal.getSistemaAtivo().id
 sistemDesc = dal.getSistemaAtivo().descricao
 
-txtUsuario.innerHTML = dal.getPerfilAtivo().nome
-txtSistema.innerHTML = dal.getSistemaAtivo().nome
-inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
-inpTitulo.value = dal.getSistemaAtivo().nome
-
-// --------------
 
 
+// =========================================================================
+// SETUP DE ELEMENTOS DA GUI
+// =========================================================================
+const txtUsuario = document.getElementById("txtUsuario")
+const txtSistema = document.getElementById("txtSistema")
+const inpTitulo = document.getElementById('inpTitulo')
+const inpDescricao = document.getElementById("inpDescricao")
+const btFinalizar = document.getElementById('btFinalizar')
+btFinalizar.addEventListener('click',clickBtFinalizar)
+const btSalvarDesc = document.getElementById("btSalvarDesc")
+btSalvarDesc.addEventListener('click',clickBtSavarDesc)
+
+
+
+// =========================================================================
+// SETUP DE COMPONENTES DA GUI
+// =========================================================================
 // ---------- COMPONENTE RESPOSTAS
 let ctrlRespostas = new controllerSelectEdit()
 ctrlRespostas.setView( 'slcResposta','inpResposta','btSalvarResposta','btApagarResposta' )
@@ -174,21 +181,36 @@ compCondicoes.inicializar( compCondicoes )
 
 
 
-// ---------- Events
-btFinalizar.addEventListener('click',clickBtFinalizar)
+// =========================================================================
+// ESTADO INICIAL DA GUI
+// =========================================================================
+txtUsuario.innerHTML = dal.getPerfilAtivo().nome
+txtSistema.innerHTML = dal.getSistemaAtivo().nome
+inpDescricao.innerHTML = dal.getSistemaAtivo().descricao
+inpTitulo.value = dal.getSistemaAtivo().nome
+
 btFinalizar.focus()
-// ---------
+
+
+
+// =========================================================================
+// FUNCOES DA GUI
+// =========================================================================
 function clickBtFinalizar(){
 	thisWin.loadFile('./sysMain.html')
 }
 
 
-btSalvarDesc.addEventListener('click',clickBtSavarDesc)
+
 function clickBtSavarDesc() {
 	salvarDesc()
 }
 
 
+
+// =========================================================================
+// FUNCOES DE PROCESSAMENTO
+// =========================================================================
 async function salvarDesc() {
 	let currentSisDOB = dal.getSistemaAtivo()
 	let sistemaDOB = {
@@ -203,5 +225,8 @@ async function salvarDesc() {
 		currentSisDOB.descricao = inpDescricao.value
 	}
 }
+
+
+
 </script>
 </html>

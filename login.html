@@ -47,8 +47,10 @@
 
 
 
-
 <script>
+// =========================================================================
+// REQUIRE
+// =========================================================================
 //const BrowserWindow = require('electron').remote.BrowserWindow
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
@@ -56,36 +58,36 @@ const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
 
 
-// ---------- Elementos da DOM
+
+// =========================================================================
+// SETUP ELEMENTOS DA GUI
+// =========================================================================
+const inpNome = document.getElementById('inpNome')
+const inpSenha1 = document.getElementById('inpSenha1')
+const inpSenha2 = document.getElementById('inpSenha2')
 const inpLogin = document.getElementById('inpLogin')
 const inpSenha = document.getElementById('inpSenha')
-const btEntrar = document.getElementById('btEntrar')
-const btNovoPerfil = document.getElementById('btNovoPerfil')
-const divMensagem = document.getElementById('divMensagem')
+
 
 const btLinkCriar = document.getElementById('btLinkCriar')
+btLinkCriar.addEventListener('click',clickBtLinkCriar)
 const btSalvar = document.getElementById('btSalvar')
+btSalvar.addEventListener('click',clickBtSalvar)
 const btCancelar = document.getElementById('btCancelar')
-//const btDeletar = document.getElementById('btDeletar')
+btCancelar.addEventListener('click',clickBtCancelar)
+const btEntrar = document.getElementById('btEntrar')
+btEntrar.addEventListener('click',tentarLogar)
 
 const cardLinkCriar = document.getElementById('cardLinkCriar')
 const cardCriar = document.getElementById('cardCriar')
 const cardLogin = document.getElementById('cardLogin')
-
-const inpNome = document.getElementById('inpNome')
-const inpSenha1 = document.getElementById('inpSenha1')
-const inpSenha2 = document.getElementById('inpSenha2')
+const divMensagem = document.getElementById('divMensagem')
 
 
-// ---------- Eventos
-btEntrar.addEventListener('click',tentarLogar)
-//btNovoPerfil.addEventListener('click',listarUsuarios)
-btLinkCriar.addEventListener('click',clickBtLinkCriar)
-btCancelar.addEventListener('click',clickBtCancelar)
-btSalvar.addEventListener('click',clickBtSalvar)
-//btDeletar.addEventListener('click',clickBtDeletar)
 
-// ---------- Funcoes de Eventos
+// =========================================================================
+// FUNCOES DE EVENTOS DA GUI
+// =========================================================================
 function clickBtLinkCriar() {
 	toggleCriarCard(1)
 }
@@ -103,7 +105,9 @@ function clickBtDeletar() {
 }
 
 
-// ---------- Funções
+// =========================================================================
+// FUNCOES DE ALTERACAO DA GUI
+// =========================================================================
 function listarUsuarios() {
 	dal.getUsuarios((rows)=>{
 		rows = JSON.stringify(rows)
@@ -112,6 +116,18 @@ function listarUsuarios() {
 }
 
 
+
+function toggleCriarCard( state ) {
+	cardLinkCriar.style.display = state == 0 ? 'flex' : 'none'
+	//cardLogin.style.display = state == 0 ? 'flex' : 'none'
+	cardCriar.style.display = state == 0 ? 'none' : 'flex'
+}
+
+
+
+// =========================================================================
+// FUNCOES DE PROCESSAMENTO
+// =========================================================================
 function isPerfilPublico() {
 	if(inpLogin.value.trim() == "")
 	return true
@@ -147,13 +163,6 @@ function tentarLogar() {
 
 
 
-function toggleCriarCard( state ) {
-	cardLinkCriar.style.display = state == 0 ? 'flex' : 'none'
-	//cardLogin.style.display = state == 0 ? 'flex' : 'none'
-	cardCriar.style.display = state == 0 ? 'none' : 'flex'
-}
-
-
 async function salvarNovoPerfil() {
 	if( inpNome.value.length == 0 ) {
 		alert( 'Preencha o campo Nome' )
@@ -187,4 +196,8 @@ async function salvarNovoPerfil() {
 		}
 	}
 }
+
+
+
 </script>
+</html>

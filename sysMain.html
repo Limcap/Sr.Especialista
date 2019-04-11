@@ -51,7 +51,7 @@
 
 <script>
 // =========================================================================
-// FLUXO: IMPORTS
+// REQUIRE
 // =========================================================================
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
@@ -61,7 +61,15 @@ const menu = require('./menu.js')
 
 
 // =========================================================================
-// FLUXO: INICIALIZACAO DE UI
+// ESTADO INICIAL DO PROCESSAMENTO
+// =========================================================================
+let tabelaConclusao = {}
+let tabelaPerguntas = {}
+
+
+
+// =========================================================================
+// SETUP DE ELEMENTOS DA GUI
 // =========================================================================
 const txtUsuario = document.getElementById("txtUsuario")
 const txtSistema = document.getElementById("txtSistema")
@@ -81,7 +89,7 @@ btConsultar.addEventListener('click',clickBtConsultar)
 
 
 // =========================================================================
-// FLUXO: PREENCHIMENTO DE UI
+// ESTADO INICIAL DA UI
 // =========================================================================
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
 txtSistema.innerHTML = dal.getSistemaAtivo().nome
@@ -103,15 +111,7 @@ txtDescricao.innerHTML = dal.getSistemaAtivo().descricao;
 
 
 // =========================================================================
-// FLUXO: MAIN
-// =========================================================================
-let tabelaConclusao = {}
-let tabelaPerguntas = {}
-
-
-
-// =========================================================================
-// FUNCOES DE EVENTOS DE UI
+// FUNCOES DE EVENTOS DA GUI
 // =========================================================================
 function clickBtSair(){
 	thisWin.loadFile('./sysSelect.html')
@@ -122,11 +122,57 @@ function clickBtEdit() {
 }
 
 function changeResposta(perguntaID, respostaID) {
-	responder( perguntaID, respostaID )
+	atualizarTabelaPerguntas( perguntaID, respostaID )
+	atualizarCardResultados()
 }
 
-function clickBtConsultar() {
-	carregarConsulta()
+async function clickBtConsultar() {
+	await criarTabelas()
+	renderizarPerguntas()
+}
+
+
+
+// =========================================================================
+// FUNCOES DE ALTERACAO DA GUI
+// =========================================================================
+function renderizarPerguntas() {
+	let formText = ''
+	for( let p in tabelaPerguntas ) {
+		console.log( p )
+		formText += `${tabelaPerguntas[p].pergunta_txt}<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
+		let respostas = tabelaPerguntas[p].respostas_possiveis
+		let options = ''
+		for( let rID in respostas ) {
+			options += `<option value='${rID}'>${respostas[rID]}</option>`
+		}
+		formText += `<option value=null> -- </option> ${options}</select><br>`
+	}
+	formDiv.innerHTML = formText
+}
+
+
+
+function atualizarCardResultados() {
+	let concText = ''
+	for( let cID in tabelaConclusao ) {
+		let conc = tabelaConclusao[cID]
+		let grupoMatch = true
+		for( let gID in conc.grupos ) {
+			for( p in conc.grupos[gID] ) {
+				let perg = conc.grupos[gID][p]
+				if( perg.resposta_certa != perg.tabelaPerguntas.resposta_usuario ) {
+					grupoMatch = false
+				}
+			}
+		}
+		if( grupoMatch ) { 
+			//alert( conc.objetivo_txt + '  = ' + conc.conclusao_txt )
+			concText += `<br><p><b>${conc.objetivo_txt}:</b><br>${conc.conclusao_txt}</p>`
+		}
+	}
+	concText = concText ? concText : '<br><p>Nenhuma conclusão possível</p>'
+	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>' + concText
 }
 
 
@@ -134,13 +180,6 @@ function clickBtConsultar() {
 // =========================================================================
 // FUNCOES DE PROCESSAMENTO
 // =========================================================================
-async function carregarConsulta() {
-	await criarTabelas()
-	renderizarPerguntas()
-}
-
-
-
 async function fetchCondicoesUnrolled() {
 	let objetivosIDs = []
 	for( let opt of slcObjetivos.selectedOptions ) {
@@ -170,7 +209,6 @@ async function criarTabelas() {
 			tabelaPerguntas[con.pergunta_fk].objetivos[con.objetivo_fk] = con.objetivo
 		}
 	}
-
 	// adicionando respostas possiveis ao objeto tabela de perguntas
 	let perguntasIDs = Object.keys(tabelaPerguntas).join(',')
 	let respostasQres = await dal.fetchAll('respostas', `pergunta_fk IN (${perguntasIDs})`)
@@ -203,58 +241,11 @@ async function criarTabelas() {
 
 
 
-function renderizarPerguntas() {
-	let formText = ''
-	for( let p in tabelaPerguntas ) {
-		console.log( p )
-		formText += `${tabelaPerguntas[p].pergunta_txt}<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
-		let respostas = tabelaPerguntas[p].respostas_possiveis
-		let options = ''
-		for( let rID in respostas ) {
-			options += `<option value='${rID}'>${respostas[rID]}</option>`
-		}
-		formText += `<option value=null> -- </option> ${options}</select><br>`
-	}
-	formDiv.innerHTML = formText
-}
-
-
-
-function responder( perguntaID, respostaID ) {
-	atualizarTabelaPerguntas( perguntaID, respostaID )
-	atualizarCardResultados()
-}
-
-
-
 function atualizarTabelaPerguntas( perguntaID,respostaID ) {
 	//alert(`${perguntaID} -  ${respostaID}`)
 	tabelaPerguntas[perguntaID].resposta_usuario = respostaID
 }
 
-
-
-function atualizarCardResultados() {
-	let concText = ''
-	for( let cID in tabelaConclusao ) {
-		let conc = tabelaConclusao[cID]
-		let grupoMatch = true
-		for( let gID in conc.grupos ) {
-			for( p in conc.grupos[gID] ) {
-				let perg = conc.grupos[gID][p]
-				if( perg.resposta_certa != perg.tabelaPerguntas.resposta_usuario ) {
-					grupoMatch = false
-				}
-			}
-		}
-		if( grupoMatch ) { 
-			//alert( conc.objetivo_txt + '  = ' + conc.conclusao_txt )
-			concText += `<br><p><b>${conc.objetivo_txt}:</b><br>${conc.conclusao_txt}</p>`
-		}
-	}
-	concText = concText ? concText : '<br><p>Nenhuma conclusão possível</p>'
-	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>' + concText
-}
 
 /*
 TESTE DO RowsToObject
@@ -287,4 +278,8 @@ dal.fetchAll('condicoes_unrolled')
 */
 
 //rows=[[]], modelObjetc={}, modelFunctions={}, newObj={}, filters=[[]], maxDepth=10
+
+
+
 </script>
+</html>

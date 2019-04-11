@@ -47,48 +47,57 @@
 
 
 <script>
-// ---------- Imports
+// =========================================================================
+// REQUIRE
+// =========================================================================
 const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
 
 
-// ---------- Elementos do DOM
-const slcSistemas = document.getElementById("slcSistemas")
+
+// =========================================================================
+// SETUP EVENTOS DA GUI
+// =========================================================================
 const btSair = document.getElementById("btSair")
-const btOk = document.getElementById("btOk")
-const btLinkCriar = document.getElementById('btLinkCriar')
-const btSalvar = document.getElementById('btSalvar')
-const btCancelar = document.getElementById('btCancelar')
-const btDeletarSistema = document.getElementById('btDeletarSistema')
-const btDeletarPerfil = document.getElementById('btDeletarPerfil')
-
-const cardLinkCriar = document.getElementById('cardLinkCriar')
-const cardCriar = document.getElementById('cardCriar')
-
-const inpTitulo = document.getElementById('inpTitulo')
-const inpDescricao = document.getElementById('inpDescricao')
-
-// ---------- Eventos
 btSair.addEventListener('click',sair)
+const btOk = document.getElementById("btOk")
 btOk.addEventListener('click',clickBtOk)
+const btLinkCriar = document.getElementById('btLinkCriar')
 btLinkCriar.addEventListener('click',clickBtLinkCriar)
-btCancelar.addEventListener('click',clickBtCancelar)
+const btSalvar = document.getElementById('btSalvar')
 btSalvar.addEventListener('click',clickBtSalvar)
+const btCancelar = document.getElementById('btCancelar')
+btCancelar.addEventListener('click',clickBtCancelar)
+const btDeletarSistema = document.getElementById('btDeletarSistema')
 btDeletarSistema.addEventListener('click',clickBtDeletarSistema)
+const btDeletarPerfil = document.getElementById('btDeletarPerfil')
 btDeletarPerfil.addEventListener('click',clickBtDeletarPerfil)
 
+const slcSistemas = document.getElementById("slcSistemas")
+const cardLinkCriar = document.getElementById('cardLinkCriar')
+const cardCriar = document.getElementById('cardCriar')
+const inpTitulo = document.getElementById('inpTitulo')
+const inpDescricao = document.getElementById('inpDescricao')
+const txtUsuario = document.getElementById('txtUsuario')
 
-// ---------- Inicialização
+
+
+// =========================================================================
+// SETUP ESTADO INICIAL DA GUI
+// =========================================================================
 if( dal.getPerfilAtivo().id <= 1 ) {
 	btDeletarPerfil.style.display = 'none'
 }
 txtUsuario.innerHTML = dal.getPerfilAtivo().nome
-preencher()
+preencherSelectBoxSistemas()
 
 
-// ---------- Funcoes de eventos
+
+// =========================================================================
+// FUNCOES DE EVENTOS DE UI
+// =========================================================================
 function clickBtOk() {
 	if(slcSistemas.value) {
 		dal.setSistemaAtivo(slcSistemas.options[slcSistemas.value-1].obj)
@@ -118,9 +127,10 @@ function clickBtDeletarPerfil() {
 
 
 
-// ---------- Funções
-
-function preencher() {
+// =========================================================================
+// FUNCOES DE ALTERACAO DA GUI
+// =========================================================================
+function preencherSelectBoxSistemas() {
 	//console.log(dal.perfilAtivo)
 	slcSistemas.innerHTML = ''
 	dal.getSistemas()
@@ -136,9 +146,11 @@ function preencher() {
 }
 
 
+
 function sair(){
 	thisWin.loadFile('login.html')
 }
+
 
 
 function toggleCriarCard( state ) {
@@ -147,6 +159,10 @@ function toggleCriarCard( state ) {
 }
 
 
+
+// =========================================================================
+// FUNCOES DE PROCESSAMENTO
+// =========================================================================
 async function salvarNovoSistema() {
 	if( inpTitulo.value.trim().length == 0 ) {
 		alert( 'Digite um nome para a nova especialidade' )
@@ -174,6 +190,7 @@ async function salvarNovoSistema() {
 }
 
 
+
 async function deletarSistema() {
 	if( slcSistemas.selectedIndex > 1 )
 	dob = {
@@ -184,13 +201,14 @@ async function deletarSistema() {
 		let res = await dal.delDataObj( dob, 'sistemas', 'id' )
 		console.log( res )
 		if( !res.err ) {
-			preencher()
+			preencherSelectBoxSistemas()
 		}
 		else {
 			alert( res.err.error )
 		}
 	}
 }
+
 
 
 async function deletarPerfil() {
@@ -215,4 +233,6 @@ async function deletarPerfil() {
 }
 
 
+
 </script>
+</html>
