@@ -25,22 +25,23 @@
 		<button id="btEdit">Editar informações</button>
 	</div>
 
-	<div class="card grow flex-v-1">
+	<div class="card grow flex-1col">
 		<h3>Fazer uma consulta</h3>
 		<p>Escolha um ou mais items a determinar</p>
 		<br>
 		<select multiple id='slcObjetivos' size=5 class='grow-1'></select>
 		<div>
 			<button id='btConsultar'>Consultar</button>
+			<button id='btFecharConsulta'>Fechar Consulta</button>
 		</div>
 	</div>
 
-	<div class="card">
+	<div class="card flex-1col" id='cardPerguntas' style='display: none'>
 		<h3>Responda às questões abaixo</h3>
 		<div id="formDiv"></div>
 	</div>
 
-	<div class="card" id='cardResultados'>
+	<div class="card flex-1col" id='cardResultados' style='display: none'>
 		<h3>Resultados</h3>
 		<div id="divResultados"></div>
 	</div>
@@ -76,6 +77,8 @@ const txtSistema = document.getElementById("txtSistema")
 const txtDescricao = document.getElementById("txtDescricao")
 const divResultados = document.getElementById('divResultados')
 const formDiv = document.getElementById('formDiv')
+const cardPerguntas = document.getElementById('cardPerguntas')
+const cardResultado = document.getElementById('cardResultados')
 
 const btSair = document.getElementById("btSair")
 btSair.addEventListener('click',clickBtSair)
@@ -139,8 +142,11 @@ async function clickBtConsultar() {
 function renderizarPerguntas() {
 	let formText = ''
 	for( let p in tabelaPerguntas ) {
-		console.log( p )
-		formText += `${tabelaPerguntas[p].pergunta_txt}<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
+		let objetivosTexto = Object.values(tabelaPerguntas[p].objetivos).join('\n')
+		formText += tabelaPerguntas[p].pergunta_txt
+		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}'> <a href='#'>( ? )</a></span>`
+		formText += `<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
+		
 		let respostas = tabelaPerguntas[p].respostas_possiveis
 		let options = ''
 		for( let rID in respostas ) {
@@ -149,12 +155,18 @@ function renderizarPerguntas() {
 		formText += `<option value=null> -- </option> ${options}</select><br>`
 	}
 	formDiv.innerHTML = formText
+	if( formText.length > 0 ) cardPerguntas.style.display = 'flex'
 }
 
 
 
 function atualizarCardResultados() {
-	let concText = ''
+	let resultadoObj = {}
+	let resultadoTexto = ''
+
+	// Itera a tabelaConclusao verificando os grupos de perguntas que
+	// foram respondidos de forma satisfazer as condicoes de conclusao
+	// e adiciona os objetivos e conclusoes no objeto resultadoObj
 	for( let cID in tabelaConclusao ) {
 		let conc = tabelaConclusao[cID]
 		let grupoMatch = true
@@ -166,13 +178,22 @@ function atualizarCardResultados() {
 				}
 			}
 		}
-		if( grupoMatch ) { 
-			//alert( conc.objetivo_txt + '  = ' + conc.conclusao_txt )
-			concText += `<br><p><b>${conc.objetivo_txt}:</b><br>${conc.conclusao_txt}</p>`
-		}
+		if( !resultadoObj[conc.objetivo_txt] ) resultadoObj[conc.objetivo_txt] = []
+		if( grupoMatch ) resultadoObj[conc.objetivo_txt].push( conc.conclusao_txt )
 	}
-	concText = concText ? concText : '<br><p>Nenhuma conclusão possível</p>'
-	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>' + concText
+	
+	// Itera o objeto resultadoObj jutando os valores na string resultadoTexto
+	for( objetivo in resultadoObj ) {
+		conclusao = resultadoObj[objetivo].join('\n')
+		if( conclusao.length == 0 ) conclusao = 'Inconclusivo'
+		resultadoTexto += `<br><p><b>${objetivo}:</b><br>${conclusao}</p>`
+	}
+
+	// atualiza a view
+	divResultados.innerHTML = '<p>A partir das respostas fornecidas foi possível concluir o seguinte:</p>'
+	divResultados.innerHTML += resultadoTexto
+	cardResultado.style.display = 'flex'
+	console.log({resultadoObj})
 }
 
 

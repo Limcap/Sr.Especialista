@@ -68,7 +68,7 @@ p {
 	flex-basis: 0;
 }
 
-.flex-v-1 {
+.flex-1col {
 	display: flex;
 	flex-direction: column;
 }
@@ -94,3 +94,10 @@ textarea.input100 {
 	overflow-y: scroll;
 }
 */
+.info-mark {
+	color: #999;
+}
+.info-mark a {
+	color: #999;
+	text-decoration: none
+}
