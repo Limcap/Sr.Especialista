@@ -6,16 +6,26 @@ const ipc = electron.ipcRenderer
 
 const template = [
 	{
-		label: 'Dev',
-		click() { thisWin.webContents.toggleDevTools() }
-	},
-	{
-		label: 'Reload',
-		click() {
-			ipc.send('reload-dao')
-			delete require.cache[require.resolve('./controllerSelectEdit.js')];
-			setTimeout(()=>thisWin.reload(),1000)
-		}
+		label: 'Develpment',
+		submenu: [
+			{
+				label: 'Toggle DevTools',
+				click() { thisWin.webContents.toggleDevTools() }
+			},
+			{
+				label: 'Hard Reload',
+				click() {
+					ipc.send('reload-dao')
+					delete require.cache[require.resolve('./controllerSelectEdit.js')];
+					setTimeout(()=>thisWin.reload(),1000)
+				}
+			},
+			{
+				label: 'Soft Reload',
+				click() { remote.getCurrentWindow().reload() }
+			}
+		]
+		
 	},
 	{
 		label: 'Zoom',
