@@ -5,14 +5,16 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-	 "test": "echo \"Error: no test specified\" && exit 1",
-	 "rebuild": "electron-rebuild -f -w sqlite3"
+    "test": "echo \"Error: no test specified\" && exit 1",
+	 "rebuild": "electron-rebuild -f -w sqlite3",
+	 "build": "electron-packager ."
   },
   "author": "Ledski",
   "license": "ISC",
   "devDependencies": {
-	 "electron": "^4.1.1",
-	 "electron-rebuild": "^1.8.4"
+    "electron": "^4.1.1",
+    "electron-packager": "^13.1.1",
+    "electron-rebuild": "^1.8.4"
   },
   "dependencies": {
     "sqlite3": "^4.0.6"

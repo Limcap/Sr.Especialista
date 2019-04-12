@@ -8,7 +8,7 @@
 
 <body>
 
-	<div class="card">
+	<div class="card blue">
 		<h3>Perfil: <span id="txtUsuario">--</span></h3>
 		As informações desse perfil estão disponíveis para qualquer pessoa
 		<br><br>
@@ -17,7 +17,7 @@
 		</div>
 	</div>
 
-	<div class='card'>
+	<div class='card red'>
 		<h3>Especialidade: <span id="txtSistema">--</span></h3>
 		<p id="txtDescricao"></p>
 		<br>
@@ -28,8 +28,8 @@
 
 	</div>
 
-	<div class="card grow">
-		<h3>Fazer uma consulta</h3>
+	<div class="card green grow">
+		<h3>Fazer uma consulta<span style='float:right'>?</span></h3>
 		<p>Escolha um ou mais items a determinar</p>
 		<br>
 		<select multiple id='slcObjetivos' size=5 class='grow-1'></select>
@@ -39,12 +39,12 @@
 		</div>
 	</div>
 
-	<div class="card" id='cardPerguntas' style='display: none'>
+	<div class="card green" id='cardPerguntas' style='display: none'>
 		<h3>Responda às questões abaixo</h3>
 		<div id="formDiv"></div>
 	</div>
 
-	<div class="card" id='cardResultados' style='display: none'>
+	<div class="card green" id='cardResultados' style='display: none'>
 		<h3>Resultados</h3>
 		<div id="divResultados"></div>
 	</div>
@@ -165,7 +165,7 @@ function renderizarPerguntas() {
 	for( let p in tabelaPerguntas ) {
 		let objetivosTexto = Object.values(tabelaPerguntas[p].objetivos).join('\n')
 		formText += tabelaPerguntas[p].pergunta_txt
-		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}'> <a href='#'>( ? )</a></span>`
+		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}' onClick='alert(this.title)' style='cursor:pointer'> ( ? )</span>`
 		formText += `<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
 		
 		let respostas = tabelaPerguntas[p].respostas_possiveis
@@ -192,12 +192,15 @@ function atualizarCardResultados() {
 		let conc = tabelaConclusao[cID]
 		let grupoMatch = true
 		for( let gID in conc.grupos ) {
+			grupoMatch = true
 			for( p in conc.grupos[gID] ) {
 				let perg = conc.grupos[gID][p]
 				if( perg.resposta_certa != perg.tabelaPerguntas.resposta_usuario ) {
 					grupoMatch = false
+					break
 				}
 			}
+			if( grupoMatch ) break
 		}
 		if( !resultadoObj[conc.objetivo_txt] ) resultadoObj[conc.objetivo_txt] = []
 		if( grupoMatch ) resultadoObj[conc.objetivo_txt].push( conc.conclusao_txt )
@@ -246,18 +249,20 @@ async function criarTabelas() {
 				objetivos: {}
 			}
 		}
-		else {
-			tabelaPerguntas[con.pergunta_fk].pergunta_txt = con.pergunta
-			tabelaPerguntas[con.pergunta_fk].objetivos[con.objetivo_fk] = con.objetivo
-		}
+		tabelaPerguntas[con.pergunta_fk].pergunta_txt = con.pergunta
+		tabelaPerguntas[con.pergunta_fk].objetivos[con.objetivo_fk] = con.objetivo
+		tabelaPerguntas[con.pergunta_fk].respostas_possiveis[con.resposta_fk] = con.resposta
 	}
-	// adicionando respostas possiveis ao objeto tabela de perguntas
+
+	/*
+	// adiciona todas as respostas ao objeto tabela de perguntas
 	let perguntasIDs = Object.keys(tabelaPerguntas).join(',')
 	let respostasQres = await dal.fetchAll('respostas', `pergunta_fk IN (${perguntasIDs})`)
 	for( let row of respostasQres ) {
 		//console.log({respostasQres})
 		tabelaPerguntas[row.pergunta_fk].respostas_possiveis[row.id] = row.resposta
 	}
+	*/
 
 	// construindo o objeto tabela de conclusoes
 	let tc, g

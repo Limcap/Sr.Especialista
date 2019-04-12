@@ -5,7 +5,7 @@
 }
 
 body {
-	background: url("./checkeredTransparentLight.png") repeat fixed;
+	background: url("./bgBlur.png") repeat fixed;
 	background-size: 25px;
 	margin: 1em 2em;
 }
@@ -114,4 +114,45 @@ textarea.input100 {
 .info-mark a {
 	color: #999;
 	text-decoration: none
+}
+
+button.minimizar {
+	float:right
+}
+
+.card.help {
+	background: rgba(255,255,255,0.0);
+	box-shadow: 0 0 0 0;
+}
+
+.body-ajuda {
+	background: url("./bgBlurLight.png") repeat fixed;
+	background-size: 25px;
+	margin: 1em 2em;
+}
+
+.body-ajuda > h1 {
+	color: #45b;
+}
+
+.body-ajuda > p {
+	display: block;
+	margin-top: 1em;
+	line-height: 1.5;
+}
+
+.blue h1,
+.blue h2,
+.blue h3 {
+	color: steelblue;
+}
+.green h1,
+.green h2,
+.green h3 {
+	color: #4a4;
+}
+.red h1,
+.red h2,
+.red h3 {
+	color: tomato;
 }

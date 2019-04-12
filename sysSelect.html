@@ -8,15 +8,18 @@
 
 <body>
 
-	<div class="card">
+	<div class="card blue">
 		<h3>Perfil: <span id="txtUsuario">Usuario</span></h3>
 		<div>
 			<button id="btSair">Sair</button>
 		</div>	
 	</div>
 
-	<div class="card">
-		<h3>Especialidades</h3>
+	<div class="card red">
+		<h3>
+			<button class='minimizar'>&#9601;</button>
+			Especialidades
+		</h3>
 		<select id="slcSistemas" size=10 style="width:100%"></select>
 		<div>
 			<button id="btOk">Entrar</button>
@@ -24,12 +27,15 @@
 		</div>
 	</div>
 	
-	<div class="card" id='cardCriarSistema'>
+	<div class="card red" id='cardCriarSistema'>
 		<div class="card-closed">
 			<a href="#" id="btAbrirCriarSistema">Criar uma nova especialidade</a>
 		</div>
 		<div class='card-open'>
-			<h3>Criar uma nova especialidade</h3>
+			<h3>
+				<button class='minimizar'>&#9601;</button>
+				Criar uma nova especialidade
+			</h3>
 			<label>Titulo</label>
 			<input type='text' id="inpTitulo" />
 			<label>Descricao</label>
@@ -41,7 +47,7 @@
 		</div>
 	</div>
 
-	<div class="card" id='cardEditarPerfil'>
+	<div class="card blue" id='cardEditarPerfil'>
 		<div class='card-closed'>
 			<a href="#" id="btAbrirEditarPerfil">Editar perfil</a>
 		</div>

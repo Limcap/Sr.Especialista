@@ -6,6 +6,10 @@ const ipc = electron.ipcRenderer
 
 const template = [
 	{
+		label: 'Dev',
+		click() { thisWin.webContents.toggleDevTools() }
+	},
+	{
 		label: 'Reload',
 		click() {
 			ipc.send('reload-dao')
@@ -14,15 +18,17 @@ const template = [
 		}
 	},
 	{
-		label: 'DevTools',
-		click() { thisWin.webContents.toggleDevTools() }
-	},
-	{
 		label: 'Zoom',
 		submenu: [
 			{ label: 'Aumentar', role: 'zoomin', accelerator: 'CmdOrCtrl+]', },
 			{ label: 'Reduzir', role:'zoomout', accelerator: 'CmdOrCtrl+[', },
 			{ role: 'resetzoom' }
+		]
+	},
+	{
+		label: 'Ajuda',
+		submenu: [
+			{ label: 'Como usar', click(){ipc.send('abrir-ajuda')} }
 		]
 	}
 ]

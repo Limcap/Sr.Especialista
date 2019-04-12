@@ -8,13 +8,22 @@ dal.conectarDb()
 
 
 // ---------- INICIALIZAR JANELA
-let win
+let winMain
 function createWindow () {
-  win = new BrowserWindow({ width: 800, height: 600 })
-  win.loadFile('sysLogin.html')
+  winMain = new BrowserWindow({ width: 800, height: 800 })
+  winMain.loadFile('sysLogin.html')
   //win.webContents.openDevTools()
 }
 app.on('ready', createWindow)
+
+let winAjuda = null
+function abrirAjuda() {
+	if( !winAjuda )
+		winAjuda = new BrowserWindow({width: 800, height: 800})
+	winAjuda.loadFile('sysAjuda.html')
+	winAjuda.on('closed', () => {winAjuda = null})
+	//winAjuda.setMenu(null)
+}
 
 
 // ---------- REINICIALIZAR DAO (Mais para desenvolvimento)
@@ -28,6 +37,8 @@ ipc.on('reload-dao',function(ev, arg) {
 	dal.setPerfilAtivo(perfilAtivo)
 	dal.setSistemaAtivo(sysAtivo)
 })
+
+ipc.on('abrir-ajuda', abrirAjuda)
 
 
 /*

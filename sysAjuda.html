@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+	<link rel="stylesheet" type="text/css" href="basic.css">
+	<title>Sr.Especialista</title>
+</head>
+
+
+
+<body class='body-ajuda'>
+
+	<h1>Manual do Sr. Especialista</h1>
+	<p>
+		Bem vindo ao Sr. Especialista, um software desenvolvido para guardar e organizar dados e informações de forma a disponibilizar conhecimento de qualquer especialidade.
+	</p>
+	<p>
+		Este manual ajudará a você entender o funcionamento do fluxo de trabalho. Todas as partes do programa com uma funcionalidade específica foram separadas em "cartões" e cada seção possui cartões relacionados para cumprir um objetivo. Por exemplo, a tela inicial possui 3 cartões:
+		Um com o título do programa, um com o formulário de login, e outro com o link para criar um novo usuário. A tela inicial está ilustrada abaixo. (o formulário é somente ilustrativo, não tente logar por aqui!)
+	</p>
+	<div class="card">
+		<h1>Sr. Especialista</h1>
+	</div>
+	<div class="card" id='cardLogin'>
+		<h3>Fazer Login</h3>
+		<br>
+		<div>Perfil:</div>
+		<div><input type="text" id="inpLogin" placeholder="P&uacute;blico"></div>
+		
+		<div>Senha:</div>
+		<div><input type="password" id="inpSenha" placeholder="******"></div>
+		
+		<div><button id="btEntrar">Entrar</button></div>
+		<div id="divMensagem"></div>
+	</div>
+	<div class="card" id='cardLinkCriar'>
+		<a href="#" id="btLinkCriar">Criar um perfil particular</a>
+	</div>
+
+	<hr>
+	
+	<h1>Perfil privado e público</h1>
+	<p>
+		Caso você deseje criar um sistema especialista com acesso privado, crie um perfil e faça o login com ele. Você também pode usar o perfil público, que já vêm preenchido por padrão no formulário de login, bastando clicar no botão entrar, porém este perfil, como diz o nome, é público e qualquer usuário poderá acessá-lo e modificar o conteúdo dos sistemas salvos nele.
+	</p>
+
+
+
+	<div class="card">
+		<h3>Perfil: <span id="txtUsuario">--</span></h3>
+		As informações desse perfil estão disponíveis para qualquer pessoa
+		<br><br>
+		<div>
+			<button id="btSairPerfil">Sair</button>		
+		</div>
+	</div>
+
+	<div class='card'>
+		<h3>Especialidade: <span id="txtSistema">--</span></h3>
+		<p id="txtDescricao"></p>
+		<br>
+		<div>
+			<button id="btSairEspecialidade">Sair</button>
+			<button id="btEdit">Editar informações</button>
+		</div>
+
+	</div>
+
+	<div class="card grow">
+		<h3>Fazer uma consulta<span style='float:right'>?</span></h3>
+		<p>Escolha um ou mais items a determinar</p>
+		<br>
+		<select multiple id='slcObjetivos' size=5 class='grow-1'></select>
+		<div>
+			<button id='btConsultar'>Consultar</button>
+			<button id='btFecharConsulta'>Fechar Consulta</button>
+		</div>
+	</div>
+
+	<div class="card" id='cardPerguntas' style='display: none'>
+		<h3>Responda às questões abaixo</h3>
+		<div id="formDiv"></div>
+	</div>
+
+	<div class="card" id='cardResultados' style='display: none'>
+		<h3>Resultados</h3>
+		<div id="divResultados"></div>
+	</div>
+
+</body>
+
+
+
+<script>
+// =========================================================================
+// REQUIRE
+// =========================================================================
+const { remote } = require('electron')
+const dal = remote.require('./data-access-layer.js')
+const thisWin = remote.getCurrentWindow()
+const menu = require('./menu.js')
