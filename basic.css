@@ -141,18 +141,23 @@ button.minimizar {
 	line-height: 1.5;
 }
 
-.blue h1,
-.blue h2,
-.blue h3 {
+.blue {
 	color: steelblue;
 }
-.green h1,
-.green h2,
-.green h3 {
+.green {
 	color: #4a4;
 }
-.red h1,
-.red h2,
-.red h3 {
+.red {
 	color: tomato;
+}
+
+.logo {
+	margin: auto;
+	max-width: 400px;
+	min-width: 20em;
+	text-align: center
+}
+
+.logo img {
+	width: 100%
 }

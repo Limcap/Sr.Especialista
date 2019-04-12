@@ -235,7 +235,7 @@ exports.saveDataObj = async function( dataObj, tableName, pkColumn ) {
 		await updateDataObj( dataObj, tableName, pkColumn )
 */
 	if( !res.err ) {
-		res.dob = await getDataObjByRowId( tableName, res.lastID )
+		res.DOB = await getDataObjByRowId( tableName, res.lastID )
 	}
 	return res
 }

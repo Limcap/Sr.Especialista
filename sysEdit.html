@@ -7,17 +7,17 @@
 
 
 <body>
-	<div class="card red">
-		<h3 class='blue'>Perfil: <span id="txtUsuario">--</span></h3>
-		<h3>Especialidade: <span id="txtSistema">--</span></h3>
+	<div class="card">
+		<h3 class="blue">Perfil: <span id="txtUsuario">--</span></h3>
+		<h3 class="red">Especialidade: <span id="txtSistema">--</span></h3>
 		<br>
 		<div>
 			<button id="btFinalizar">Finalizar edição</button>
 		</div>
 	</div>
 
-	<div class="card red grow">
-		<h3>Titulo e Descrição</h3>
+	<div class="card grow">
+		<h3 class="red">Titulo e Descrição</h3>
 		<input type='text' id="inpTitulo" />
 		<textarea id="inpDescricao" size=2 class="grow-1"></textarea>
 		<div>
@@ -25,10 +25,10 @@
 		</div>
 	</div>
 
-	<div class="card red grow">
+	<div class="card grow">
 		<section class='section-73'>
-			<h3>Objetivos</h3>
-			<h3>Conclusões</h3>
+			<h3 class="red">Objetivos</h3>
+			<h3 class="red">Conclusões</h3>
 		</section>
 		<section class='section-73 grow-1'>
 			<select id='slcObjetivo' size=5></select>
@@ -50,10 +50,10 @@
 		</section>
 	</div>
 
-	<div class="card red grow">
+	<div class="card grow">
 		<section class='section-73'>
-			<h3>Perguntas</h3>
-			<h3>Respostas</h3>
+			<h3 class="red">Perguntas</h3>
+			<h3 class="red">Respostas</h3>
 		</section>
 		<section class='section-73 grow-1'>
 			<select id='slcPergunta' size=5></select>
@@ -75,8 +75,8 @@
 		</section>
 	</div>
 
-	<div class="card red grow">
-		<h3>Condições</h3>
+	<div class="card grow">
+		<h3 class="red">Condições</h3>
 		<input id='inpCondicao' readonly style='margin-bottom:0; margin-top:.5em'/>
 		<div>SE</div>
 		<select id="slcCondicao" class="grow-1" size=5></select>
@@ -87,6 +87,10 @@
 			<button id='btUp'>&#9650;</button>
 			<button id='btDown'>&#9660;</button><!--   -->
 		</div>
+	</div>
+
+	<div class="logo">
+		<img src="./logo.png">
 	</div>
 
 </body>

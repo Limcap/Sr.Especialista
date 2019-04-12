@@ -8,8 +8,8 @@
 
 <body>
 
-	<div class="card blue">
-		<h3>Perfil: <span id="txtUsuario">--</span></h3>
+	<div class="card">
+		<h3 class="blue">Perfil: <span id="txtUsuario">--</span></h3>
 		As informações desse perfil estão disponíveis para qualquer pessoa
 		<br><br>
 		<div>
@@ -17,8 +17,8 @@
 		</div>
 	</div>
 
-	<div class='card red'>
-		<h3>Especialidade: <span id="txtSistema">--</span></h3>
+	<div class='card'>
+		<h3 class="red">Especialidade: <span id="txtSistema">--</span></h3>
 		<p id="txtDescricao"></p>
 		<br>
 		<div>
@@ -28,8 +28,8 @@
 
 	</div>
 
-	<div class="card green grow">
-		<h3>Fazer uma consulta<span style='float:right'>?</span></h3>
+	<div class="card grow">
+		<h3 class="green">Fazer uma consulta<span style='float:right'>?</span></h3>
 		<p>Escolha um ou mais items a determinar</p>
 		<br>
 		<select multiple id='slcObjetivos' size=5 class='grow-1'></select>
@@ -39,14 +39,18 @@
 		</div>
 	</div>
 
-	<div class="card green" id='cardPerguntas' style='display: none'>
-		<h3>Responda às questões abaixo</h3>
+	<div class="card" id='cardPerguntas' style='display: none'>
+		<h3 class="green">Responda às questões abaixo</h3>
 		<div id="formDiv"></div>
 	</div>
 
-	<div class="card green" id='cardResultados' style='display: none'>
-		<h3>Resultados</h3>
+	<div class="card" id='cardResultados' style='display: none'>
+		<h3 class="green">Resultados</h3>
 		<div id="divResultados"></div>
+	</div>
+
+	<div class="logo">
+		<img src="./logo.png">
 	</div>
 
 </body>
