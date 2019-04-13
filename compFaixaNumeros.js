@@ -2,7 +2,7 @@ exports.rule = {
 	full: /^[fF]aixa(\s)*::(\s)*(\d)+(\s)*a(\s)*(\d)+(\s)*$/,
 	cmd: /^(\s)*[Ff]aixa(\s)*::(\s)*/,
 	param: /(\s)*(\d)+(\s)*a(\s)*(\d)+(\s)*$/,
-	split: /a/
+	splitter: /a/
 }
 
 
@@ -32,7 +32,7 @@ exports.formatFaixaDeNumeros = function( text ) {
 
 exports.getRange = function( text ) {
 	if( this.isFaixaDeNumero( text ) ) {
-		return text.replace(this.rule.cmd,'').split(this.split)
+		return text.replace(this.rule.cmd,'').split(this.rule.splitter)
 	}
 	else return []
 }
@@ -52,6 +52,7 @@ exports.getMin = function( text ) {
 
 exports.getMax = function( text ) {
 	let arr = this.getRange( text )
+	console.log({arr})
 	if( arr.length == 0 ) return null
 	let a = parseInt( arr[0] )
 	let b = parseInt( arr[1] )

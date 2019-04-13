@@ -341,7 +341,7 @@ exports.updateOptText = function( condicaoDOB ) {
 
 	let pergunta = '' 
 	let resposta = ''
-	let comparativo = '='
+	let comparativo = condicaoDOB.comparativo ? condicaoDOB.comparativo : '='
 
 	for( let i = 0; i < cPerg.length; i++ ) {
 		if( cPerg[i].id == condicaoDOB.pergunta_fk ) {
@@ -351,7 +351,7 @@ exports.updateOptText = function( condicaoDOB ) {
 
 	if( condicaoDOB.valorDeFaixa ) {
 		resposta = condicaoDOB.valorDeFaixa
-		comparativo = condicaoDOB.comparativo ? condicaoDOB.comparativo : '='
+		
 	} else {
 		for( let i = 0; i < cResp.length; i++ ) {
 			if( cResp[i].id == condicaoDOB.resposta_fk ) {
@@ -456,7 +456,7 @@ exports.btnLargerClick = function( ev ) {
 }
 
 exports.inpNumberChange = function( ev ) {
-	ev.target.controller.setRangeValue( ev.target.value )
+	ev.target.controller.checkMinMax( ev.target )
 }
 
 exports.inpNumberBlur = function( ev ) {
@@ -464,6 +464,46 @@ exports.inpNumberBlur = function( ev ) {
 }
 
 
-exports.setComparator = function( c ) {
-	alert( c )
+
+exports.setComparator = async function( comparator ) {
+	let opt = this.view.slcBox.selectedOptions[0]
+	if( opt && opt.DOB )
+		window.a = this.updateAndSaveDOB( opt.DOB, {comparativo:comparator} ) 
+	
+	return
+	let DALDOB = this.formatDOBtoDAL( opt.DOB,'update' )
+	DALDOB.comparativo = comparator
+	let res = await this.persist.save( DALDOB,'condicoes','id' )
+	if( res.err ) throw res.err
+	opt.DOB.comparativo = comparator
+	this.updateOptText( opt.DOB )
+}
+
+exports.checkMinMax = function( elm ) {
+	if( elm.value < elm.min ) elm.value = elm.min
+	if( elm.value > elm.max ) elm.value = elm.max
+}
+
+exports.setRangeValue = async function( valor ) {
+	let opt = this.view.slcBox.selectedOptions[0]
+	if( opt && opt.DOB )
+		this.updateAndSaveDOB( opt.DOB, {valorDeFaixa:valor} ) 
+}
+
+exports.updateAndSaveDOB = async function( DOB, changes ) {
+	let DALDOB = this.formatDOBtoDAL( DOB,'update' )
+	this.updateDOB( DALDOB, changes )
+	let res = await this.persist.save( DALDOB,'condicoes','id' )
+	if( res.err ) throw res.err
+	console.log({res})
+	this.updateDOB( DOB, res.DOB )
+	this.updateOptText( DOB )
+	return res.DOB
+}
+
+exports.updateDOB = function( DOB, changes ) {
+	console.log({DOB},{changes})
+	for( key in changes ) {
+		DOB[key] = changes[key]
+	}
 }

@@ -265,13 +265,22 @@ let insertDataObj = function( dataObj, tableName ) {
 let updateDataObj = function( dataObj, tableName, pkColumn ) {
 	console.log('\n========== DAL UPDATE DOB')
 	return new Promise(( resolve, reject ) => {
-		let pairs = Object.entries( dataObj )
-		pairs = pairs.filter(x => x[0] != pkColumn).map( x => x[0]+' = "'+x[1]+'"' ).join( ',' )
 		let pkValue = dataObj[pkColumn]
-		let qry = `UPDATE ${tableName} SET ${pairs} WHERE ${pkColumn} = ${pkValue}`
-		db.run(qry, [], function( err ) {
+
+		let pairs = Object.entries( dataObj )
+		let columns = pairs.filter(p=>p[0]!=pkColumn).map(p=>`${p[0]} = ?`).join(', ')
+		let values = pairs.filter(p=>p[0]!=pkColumn).map(p=>p[1])
+		let qry = `UPDATE ${tableName} SET ${columns} WHERE ${pkColumn} = ${pkValue}`
+		console.log({qry})
+		db.run(qry, values, function( err ) {
 			resolve( { err:err, lastID:pkValue } )
 		})
+		//let pairs = Object.entries( dataObj )
+		//pairs = pairs.filter(x => x[0] != pkColumn).map( x => x[0]+' = "'+x[1]+'"' ).join( ',' )
+		//let qry = `UPDATE ${tableName} SET ${pairs} WHERE ${pkColumn} = ${pkValue}`
+		//db.run(qry, [], function( err ) {
+		//	resolve( { err:err, lastID:pkValue } )
+		//})
 	})
 }
 
