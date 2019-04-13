@@ -38,6 +38,7 @@ let ControllerSelectEdit = function() {
 
 
 
+
 ControllerSelectEdit.prototype.getSelectedDobId = function() {
 	// retorna nulo se nao houver item selecionado ou se
 	// o item não possuir um DOB associado
@@ -49,11 +50,13 @@ ControllerSelectEdit.prototype.getSelectedDobId = function() {
 
 
 
+
 ControllerSelectEdit.prototype.getSelectedDob = function() {
 	let sb = this.view.selectBox
 	if( !sb || sb.selectedIndex == -1 ) return null
 	else return sb.options.item( sb.selectedIndex ).DOB
 }
+
 
 
 
@@ -63,6 +66,7 @@ ControllerSelectEdit.prototype.setView = function( selectBox, inputField, button
 	this.view.buttonSave = document.getElementById( buttonSave )
 	this.view.buttonDel = document.getElementById( buttonDel )
 }
+
 
 
 
@@ -76,12 +80,14 @@ ControllerSelectEdit.prototype.setRefs = function( textColumn, pkColumn, fkColum
 
 
 
+
 ControllerSelectEdit.prototype.updateChild = function( child ) {
 	if( child ) this._child = child
 	if( this._child instanceof controllerSelectEdit ) {
 		this._child.setFkValue( this.getSelectedDobId() )
 	}
 }
+
 
 
 
@@ -92,6 +98,7 @@ ControllerSelectEdit.prototype.setFkValue = function( fkValue ) {
 
 
 
+
 ControllerSelectEdit.prototype.boot = async function() {
 	// carregar os dados
 	this.data.all = await this.data.fetch()
@@ -99,6 +106,7 @@ ControllerSelectEdit.prototype.boot = async function() {
 	this._setupView()
 	this.render()
 }
+
 
 
 
@@ -131,6 +139,7 @@ ControllerSelectEdit.prototype.render = function() {
 
 
 
+
 ControllerSelectEdit.prototype._setupView = function() {
 	let th = this
 	function onEvent(obj,type,handler) {
@@ -145,6 +154,7 @@ ControllerSelectEdit.prototype._setupView = function() {
 
 
 
+
 ControllerSelectEdit.prototype._newOption = function( text, value, DOB ) {
 	opt = document.createElement( "option" )
 	opt.text = text
@@ -152,6 +162,7 @@ ControllerSelectEdit.prototype._newOption = function( text, value, DOB ) {
 	opt.DOB = DOB
 	return opt
 }
+
 
 
 
@@ -165,6 +176,7 @@ ControllerSelectEdit.prototype._insertEmptyOpt = function( select=true ) {
 		this.view.inputField.focus()
 	}
 }
+
 
 
 
@@ -183,84 +195,131 @@ ControllerSelectEdit.prototype._changeOpt = function( ev ) {
 
 
 
+
 ControllerSelectEdit.prototype._callOnChangeHooks = function( opt ) {
-	let onSelect = this.logic.onSelect
+	let logicOnSelect = this.logic.onSelect
 	let hookOnSelect = this.hooks.onSelect
-	if( typeof onSelect === 'function' ) onSelect( opt )
+	if( typeof logicOnSelect === 'function' ) logicOnSelect( opt )
 	if( typeof hookOnSelect === 'function' ) hookOnSelect( opt )
 }
 
 
 
+
 ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
-	let ctrl = ev.target.controller
-	let r = ctrl.refs
-	let v = ctrl.view
-	let l = ctrl.logic
+	ev.target.controller._saveForm()
+}
+
+
+
+
+ControllerSelectEdit.prototype._saveForm = async function() {
+	console.log('saving')
+	let selected = this.view.selectBox.options.item( this.view.selectBox.selectedIndex )
 	
-	let selected = v.selectBox.options.item( v.selectBox.selectedIndex )
+	// ====== VERIFICA SE O FORMULARIO ESTA PRONTO PARA SALVAR
+	if( !this._verifyFormStateIsReadyToSave() )
+		return false
+
+	// ====== VERIFICA SE O INPUT EH FAIXA DE NUMEROS
+	let newText = this.view.inputField.value.trim()
+	let validacao = this._validaFaixaDeNumero()
+	if( validacao == -1 )
+		return false
+	if( validacao == 1 )
+		newText = this._formatFaixaDeNumeros( newText )
+
+	// ======= PREPARA DALDOB
+	let isInsert = !selected.DOB // modo 'insert' se a opção '+' estiver selecionada (ela não possui um DOB associado)
+	let DALDOB = {}
+	DALDOB[this.refs.fkColumn] = this.refs.fkValue
+	DALDOB[this.refs.textColumn] = newText
+	if( !isInsert ) DALDOB[this.refs.pkColumn] = DOB[this.refs.pkColumn]
+	console.log(JSON.stringify(DOB))
+	
+	// ====== SALVA EXTERNAMENTE
+	let res = await this._saveExternal( DALDOB, this.refs.pkColumn )
+	
+	// ====== ATULIZA O MODEL E A VIEW
+	this._updateModelAndView( res.DOB )
+	
+	// ====== EXECUTA GANCHOS
+	this._callOnChangeHooks( selected )
+}
+
+
+
+
+ControllerSelectEdit.prototype._verifyFormStateIsReadyToSave = function() {
+	let selected = this.view.selectBox.options.item( this.view.selectBox.selectedIndex )
 	// se nada estiver selecionado
 	if( !selected ) {
 		alert( 'Selecione um item primeiro' )
 		return false
 	}
-	let newText = v.inputField.value.trim()
-	let oldText = selected.text
-
-	let validacao = ctrl._validaFaixaDeNumero( newText )
-	if( validacao == -1 ) return
-	if( validacao == 1 ) newText = ctrl._formatFaixaDeNumeros( newText )
-
-	console.log({validacao},{newText})
+	// se nao estiver nada escrito no input
+	let newText = this.view.inputField.value.trim()
+	if( newText.length == 0 )
+		return false
 	
-	if( newText.length > 0 ) {
-		let success = true
-		// modo 'insert' se a opção '+' estiver selecionada (ela não possui um DOB associado)
-		let isInsert = !selected.DOB
-		let DOB = isInsert ? {} : selected.DOB
-		// adiciona informacao no DOB
-		DOB[r.fkColumn] = r.fkValue
-		DOB[r.textColumn] = newText
-		console.log(JSON.stringify(DOB))
-		if( typeof l.onSave === 'function') {
-			// chama funcao de salvamento externa
-			let res = await l.onSave( DOB, r.pkColumn )
-			if( res === false ) { // cancela a salvamento
-				DOB[r.textColumn] = oldText
-				success = false
-			}
-			else if( res.err ) { // erro no salvamento
-				DOB[r.textColumn] = oldText
-				alert( "Ocorreu um erro ao tentar salvar o item" )
-				success = false
-				throw res.err
-			} else { // salvamento bem sucedido
-				console.log( 'ControllerSelectEdit: data saved successfully' )
-				selected.DOB = res.DOB
-				selected.text = res.DOB[r.textColumn]
-				if( isInsert ) {
-					ctrl._addDOB( selected.DOB )
-					// if(ctrl._child) {
-					// 	ctrl._insertEmptyOpt( false )
-					// } else {
-					// 	ctrl._insertEmptyOpt()
-					// 	ctrl.view.inputField.focus()
-					// }
-				}
-			}
-		} else { // não existe função de salvamento
-			selected.DOB = DOB
-			selected.text = DOB[r.textColumn]
-			if( isInsert ) ctrl._insertEmptyOpt()
+	return true
+}
+
+
+
+
+ControllerSelectEdit.prototype._saveExternal = async function( DALDOB, pkColumn ) {
+	let res = typeof this.logic.onSave === 'function' ?
+		await this.logic.onSave( DALDOB, pkColumn ) :
+		{ DOB: DALDOB }
+	if( res.err ) {
+		alert( 'Ocorreu um erro ao tentar salvar o item' )
+		throw res.err
+	}
+	else {
+		console.log( 'ControllerSelectEdit: DOB saved successfully' )
+	}
+	return res
+}
+
+
+
+
+ControllerSelectEdit.prototype._updateModelAndView = function( newDOB ) {
+	let selected = this.view.selectBox.options.item( this.view.selectBox.selectedIndex )
+	let isInsert = !selected.DOB
+	// ======= UPDATE POOL
+	this._deleteFromPool( selected.DOB )
+	this._addToPool( newDOB )
+
+	// ====== UPDATE VIEW
+	selected.DOB = newDOB
+	selected.text = newDOB[this.refs.textColumn]
+	if( isInsert ) {
+		this._insertEmptyOpt( !this._child )
+		this.updateChild()
+		if( this._child ) ctrl._child.view.inputField.focus()
+	}
+}
+
+
+
+
+ControllerSelectEdit.prototype._deleteFromPool = function( DOBtoDel ) {
+	let a = this.data.all
+	let c = this.data.current
+	for( var i = 0; i < a.length; i++){
+		if ( a[i] === DOBtoDel ) {
+			a.splice(i, 1)
+			i--
 		}
-		if( success && isInsert ) {
-			ctrl._insertEmptyOpt( !ctrl._child )
-			ctrl.updateChild()
-			if( ctrl._child ) ctrl._child.view.inputField.focus()
-			ctrl._callOnChangeHooks( selected )
+		if( i < c.length && c[i] === DOBtoDel ) {
+			c.splice(i, 1)
+			i--
 		}
 	}
 }
+
 
 
 
@@ -271,7 +330,8 @@ ControllerSelectEdit.prototype._clickBtSave = async function( ev ) {
  * 			-1 se é faixa de número e não pode ser inlcuída ou se já existe uma faixa de números;
  * 			0 se não é faixa de número 
  */
-ControllerSelectEdit.prototype._validaFaixaDeNumero = function( newText ) {
+ControllerSelectEdit.prototype._validaFaixaDeNumero = function() {
+	let newText = this.view.inputField.value.trim()
 	let isEmptyList = this.data.current.length == 0
 	let thereIsOnlyOneItem  = this.data.current.length <= 1
 	let isNewItem = !this.view.selectBox.selectedOptions[0].DOB
@@ -297,6 +357,7 @@ ControllerSelectEdit.prototype._validaFaixaDeNumero = function( newText ) {
 
 
 
+
 /**
  * Verifica se o parametro passdo é uma faixa de números
  */
@@ -311,6 +372,7 @@ ControllerSelectEdit.prototype._isFaixaDeNumero = function( text ) {
 
 
 
+
 ControllerSelectEdit.prototype._existeFaixaDeNumeros = function() {
 	let existe = false
 	for( DOB of this.data.current ) {
@@ -322,6 +384,7 @@ ControllerSelectEdit.prototype._existeFaixaDeNumeros = function() {
 
 
 
+
 ControllerSelectEdit.prototype._formatFaixaDeNumeros = function( text ) {
 	let arr = text.replace(/[Ff]aixa(\s)*::/,'').split(/a/)
 	return `Faixa :: ${arr[0].trim()} a ${arr[1].trim()}`
@@ -329,10 +392,12 @@ ControllerSelectEdit.prototype._formatFaixaDeNumeros = function( text ) {
 
 
 
-ControllerSelectEdit.prototype._addDOB = function( DOB ) {
+
+ControllerSelectEdit.prototype._addToPool = function( DOB ) {
 	this.data.all.push( DOB )
 	this.data.current.push( DOB )
 }
+
 
 
 
@@ -346,6 +411,7 @@ ControllerSelectEdit.prototype._clickBtDel = function( ev ) {
 		ctrl._deleteByIndex( slcBox.selectedIndex )
 	}
 }
+
 
 
 
@@ -368,6 +434,7 @@ ControllerSelectEdit.prototype._deleteByIndex = function( slcIndex ) {
 
 
 
+
 ControllerSelectEdit.prototype._externalDelete = async function( DOB, pkColumn ) {
 	let l = this.logic
 	if( typeof l.onDelete === "function" ) {
@@ -382,6 +449,7 @@ ControllerSelectEdit.prototype._externalDelete = async function( DOB, pkColumn )
 
 
 
+
 ControllerSelectEdit.prototype._deleteChildDOBsWithFkValue = function( fkValue ) {
 	if( this._child instanceof ControllerSelectEdit ) {
 		let d = this.data
@@ -391,6 +459,7 @@ ControllerSelectEdit.prototype._deleteChildDOBsWithFkValue = function( fkValue )
 		this.updateChild()
 	}
 }
+
 
 
 
