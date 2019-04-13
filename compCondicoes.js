@@ -1,4 +1,5 @@
 const dal = require('electron').remote.require('./data-access-layer')
+const compFaixaNumeros = require('./compFaixaNumeros')
 /*
 let objetivoDOB
 let conclusaoDOB
@@ -10,10 +11,17 @@ btSalvarCondicao.addEventListener('click',exports.adicionarCondicao)
 exports.view = {
 	slcBox: null,
 	inpBox: null,
-	btnSave: null,
+	btnAdd: null,
 	btnDel: null,
 	btnUp: null,
-	btnDown: null
+	btnDown: null,
+	btnEqual: null,
+	btnDiff: null,
+	btnSmaller: null,
+	btnLarger: null,
+	inpNumber: null,
+	btnSaveNumber: null,
+	grpRageControls: null
 }
 
 exports.ctrl = {
@@ -33,13 +41,20 @@ exports.persist = {
 	delete: null
 }
 
-exports.setView = function( slcBox, inpBox, btnSave, btnDel, btnUp, btnDown ) {
+exports.setView = function( slcBox, inpBox, btnAdd, btnDel, btnUp, btnDown, btnEqual, btnDiff, grpRangeControls, btnSmaller, btnLarger, inpNumber, btnSaveNumber ) {
 	this.view.slcBox = document.getElementById(slcBox)
 	this.view.inpBox = document.getElementById(inpBox)
-	this.view.btnSave = document.getElementById(btnSave)
+	this.view.btnAdd = document.getElementById(btnAdd)
 	this.view.btnDel = document.getElementById(btnDel)
 	this.view.btnUp = document.getElementById(btnUp)
 	this.view.btnDown = document.getElementById(btnDown)
+	this.view.btnEqual = document.getElementById(btnEqual)
+	this.view.btnDiff = document.getElementById(btnDiff)
+	this.view.grpRangeControls = document.getElementById(grpRangeControls)
+	this.view.btnSmaller = document.getElementById(btnSmaller)
+	this.view.btnLarger = document.getElementById(btnLarger)
+	this.view.inpNumber = document.getElementById(inpNumber)
+	this.view.btnSaveNumber = document.getElementById(btnSaveNumber)
 }
 
 
@@ -100,10 +115,18 @@ exports.newOpt = function( text ) {
 
 
 exports.configViewEvents = function() {
-	this.attachEvent( this.view.btnSave,'click',this.btnSaveClick )
+	this.attachEvent( this.view.btnAdd,'click',this.btnAddClick )
 	this.attachEvent( this.view.btnDel,'click',this.btnDelClick )
 	this.attachEvent( this.view.btnUp,'click',this.btnUpClick )
 	this.attachEvent( this.view.btnDown,'click',this.btnDownClick )
+	this.attachEvent( this.view.slcBox,'change',this.slcBoxChange )
+	this.attachEvent( this.view.btnEqual,'click',this.btnEqualClick )
+	this.attachEvent( this.view.btnDiff,'click',this.btnDiffClick )
+	this.attachEvent( this.view.btnSmaller,'click',this.btnSmallerClick )
+	this.attachEvent( this.view.btnLarger,'click',this.btnLargerClick )
+	this.attachEvent( this.view.inpNumber,'change',this.inpNumberChange )
+	this.attachEvent( this.view.inpNumber,'blur',this.inpNumberBlur )
+
 }
 
 
@@ -117,6 +140,9 @@ exports.attachEvent = function ( obj,type,handler ) {
 
 
 exports.configConclusaoSelectEvent = function( self ){
+	this.ctrl.objetivos.hooks.onSelect = ()=>self.render()
+	this.ctrl.perguntas.hooks.onSelect = ()=>self.render()
+	this.ctrl.respostas.hooks.onSelect = ()=>self.render()
 	this.ctrl.conclusoes.hooks.onSelect = ()=>self.render()
 	//this.ctrl.conclusoes.hooks.onSelect = () => self.atualizarResultado()
 }
@@ -133,7 +159,7 @@ exports.atualizarResultado = function() {
 
 
 
-exports.btnSaveClick = function( ev ) {
+exports.btnAddClick = function( ev ) {
 	ev.target.controller.adicionarCondicao()
 }
 
@@ -145,10 +171,9 @@ exports.adicionarCondicao = async function() {
 	let respostaDOB = this.ctrl.respostas.getSelectedDob()
 	let perguntaDOB = this.ctrl.perguntas.getSelectedDob()
 
-	let grupo = 0
 	let condicaoOpt  = this.view.slcBox.selectedOptions[0]
-	grupo = condicaoOpt && condicaoOpt.DOB ? condicaoOpt.DOB.grupo : 0
-	console.log({grupo})
+	let grupo = condicaoOpt && condicaoOpt.DOB ? condicaoOpt.DOB.grupo : 0
+	let valorPadraoDeFaixa = respostaDOB ? compFaixaNumeros.getMin( respostaDOB.resposta ) : null
 
 	if( !objetivoDOB ) alert('Selecione um objetivo')
 	else if( !conclusaoDOB ) alert('Selecione uma conclusão')
@@ -161,7 +186,8 @@ exports.adicionarCondicao = async function() {
 			conclusao_fk: conclusaoDOB.id,
 			pergunta_fk: perguntaDOB.id,
 			resposta_fk: respostaDOB.id,
-			grupo: grupo
+			grupo: grupo,
+			valorDeFaixa: valorPadraoDeFaixa
 		}
 
 		let DALDOB = this.formatDOBtoDAL( newDOB, 'insert' )
@@ -189,7 +215,9 @@ exports.formatDOBtoDAL = function( DOB={}, mode='update' ) {
 		id: DOB.id,
 		conclusao_fk: DOB.conclusao_fk || null,
 		resposta_fk: DOB.resposta_fk || null,
-		grupo: DOB.grupo || 0
+		grupo: DOB.grupo || 0,
+		valorDeFaixa: DOB.valorDeFaixa || null,
+		comparativo: DOB.comparativo || '='
 	}
 	if( mode == 'insert'){
 		console.log({mode})
@@ -238,6 +266,7 @@ exports.apagarExterno = function( DOB ) {
 
 
 exports.render = function() {
+	console.log('\n==== RENDER')
 	// apaga a renderizacao anterior
 	let slcBox = this.view.slcBox
 	slcBox.innerHTML = ''
@@ -265,6 +294,14 @@ exports.render = function() {
 			ouOpt.style = 'font-weight: bold'
 			slcBox.options.add( ouOpt )
 		}
+	}
+
+	// Reseta o estado dos controles
+	this.view.grpRangeControls.classList.add('disabledGroup')
+	this.view.inpNumber.value = null
+	// Ajusta o estado dos controles para a opcao selecionada
+	if( this.view.slcBox.selectedIndex != -1 ) {
+		this.editCondicao()
 	}
 }
 
@@ -298,24 +335,32 @@ exports.criarRenderArray = function( conclusaoID ) {
 
 
 
-exports.updateOptText = function( DOB ) {
+exports.updateOptText = function( condicaoDOB ) {
 	let cPerg = this.ctrl.perguntas.data.all
 	let cResp = this.ctrl.respostas.data.all
 
 	let pergunta = '' 
 	let resposta = ''
+	let comparativo = '='
 
 	for( let i = 0; i < cPerg.length; i++ ) {
-		if( cPerg[i].id == DOB.pergunta_fk ) {
+		if( cPerg[i].id == condicaoDOB.pergunta_fk ) {
 			pergunta = cPerg[i].pergunta 
 		}
 	}
-	for( let i = 0; i < cResp.length; i++ ) {
-		if( cResp[i].id == DOB.resposta_fk ) {
-			resposta = cResp[i].resposta 
+
+	if( condicaoDOB.valorDeFaixa ) {
+		resposta = condicaoDOB.valorDeFaixa
+		comparativo = condicaoDOB.comparativo ? condicaoDOB.comparativo : '='
+	} else {
+		for( let i = 0; i < cResp.length; i++ ) {
+			if( cResp[i].id == condicaoDOB.resposta_fk ) {
+				resposta = cResp[i].resposta 
+			}
 		}
 	}
-	DOB.opt.text = `${pergunta} = ${resposta}`
+
+	condicaoDOB.opt.text = `${pergunta}   ${comparativo}   ${resposta}`
 }
 
 
@@ -366,4 +411,59 @@ exports.mudarDeGrupo = async function( offset ) {
 		console.log(`Grupo atual: ${grupo}(${grupoReal}) - Novo grupo: ${DOB.grupo}`)
 	}
 	this.render()
+}
+
+
+
+exports.slcBoxChange = function( ev ) {
+	ev.target.controller.editCondicao()
+}
+
+
+
+exports.editCondicao = function() {
+	let v = this.view
+	let condicaoDOB = v.slcBox.selectedOptions[0].DOB
+	if( condicaoDOB != null && condicaoDOB.valorDeFaixa ) {
+		v.grpRangeControls.classList.remove('disabledGroup')
+		console.log({condicaoDOB})
+		v.inpNumber.value = condicaoDOB.valorDeFaixa
+		v.inpNumber.min = compFaixaNumeros.getMin( condicaoDOB.resposta )
+		v.inpNumber.max = compFaixaNumeros.getMax( condicaoDOB.resposta )
+	}
+	else {
+		v.grpRangeControls.classList.add('disabledGroup')
+		v.inpNumber.value = null
+	}
+}
+
+
+
+exports.btnEqualClick = function( ev ) {
+	ev.target.controller.setComparator('=')
+}
+
+exports.btnDiffClick = function( ev ) {
+	ev.target.controller.setComparator('!=')
+}
+
+exports.btnSmallerClick = function( ev ) {
+	ev.target.controller.setComparator('<')
+}
+
+exports.btnLargerClick = function( ev ) {
+	ev.target.controller.setComparator('>')
+}
+
+exports.inpNumberChange = function( ev ) {
+	ev.target.controller.setRangeValue( ev.target.value )
+}
+
+exports.inpNumberBlur = function( ev ) {
+	ev.target.controller.setRangeValue( ev.target.value )
+}
+
+
+exports.setComparator = function( c ) {
+	alert( c )
 }
