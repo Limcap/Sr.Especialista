@@ -65,6 +65,8 @@ const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
+const compFaixaNumeros = require('./compFaixaNumeros')
+const out = remote.require('./out')
 
 
 
@@ -115,7 +117,7 @@ btFecharConsulta.disabled = true;
 (async function inflarSlcObjetivos() {
 	let slcObjetivos = document.getElementById('slcObjetivos')
 	let objetivosConsultaveis = await dal.fetchAll('objetivos_consultaveis')
-	console.log({objetivosConsultaveis})
+	//console.log({objetivosConsultaveis})
 	for( let item of objetivosConsultaveis ) {
 		let opt = document.createElement('option')
 		opt.text = item.objetivo
@@ -141,14 +143,14 @@ function clickBtEdit() {
 	thisWin.loadFile('./sysEdit.html')
 }
 
-function changeResposta(perguntaID, respostaID) {
-	atualizarTabelaPerguntas( perguntaID, respostaID )
-	atualizarCardResultados()
+function changeResposta( perguntaID, respostaUSR ) {
+	atualizarTabelaPerguntas( perguntaID, respostaUSR )
+	renderCardResultados()
 }
 
 async function clickBtConsultar() {
 	await criarTabelas()
-	renderizarPerguntas()
+	renderCardPerguntas()
 	btFecharConsulta.disabled = false
 }
 
@@ -164,20 +166,38 @@ function clickBtFecharConsulta() {
 // =========================================================================
 // FUNCOES DE ALTERACAO DA GUI
 // =========================================================================
-function renderizarPerguntas() {
+function renderCardPerguntas() {
 	let formText = ''
-	for( let p in tabelaPerguntas ) {
-		let objetivosTexto = Object.values(tabelaPerguntas[p].objetivos).join('\n')
-		formText += tabelaPerguntas[p].pergunta_txt
+	for( let pID in tabelaPerguntas ) {
+		let pObj = tabelaPerguntas[pID]
+		let pTxt = pObj.pergunta_txt
+		let pTemp = pTxt.split('::')
+		pTxt = pTemp.length > 1 ? pTemp[1] : pTemp[0]
+
+		let objetivosTexto = Object.values(pObj.objetivos).join('\n')
+		formText += `<div class='pergunta'>${pTxt}`
 		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}' onClick='alert(this.title)' style='cursor:pointer'> ( ? )</span>`
-		formText += `<br><select id='pergunta_${p}' onChange='changeResposta(${p},this.value)'>`
+		formText += `<br>`
 		
-		let respostas = tabelaPerguntas[p].respostas_possiveis
-		let options = ''
-		for( let rID in respostas ) {
-			options += `<option value='${rID}'>${respostas[rID]}</option>`
+		let respostas = pObj.respostas_possiveis
+		let r0 = Object.values(respostas)[0]
+		if( compFaixaNumeros.isFaixaDeNumero( r0 ) ) {
+			//console.log('isFaixa',{r0})
+			let fn = compFaixaNumeros.getRange( r0 )
+			if( fn[0] > fn[1] ) [fn[0], fn[1]] = [fn[1], fn[0]]
+			formText +=`<input id='pergunta_${pID}' onChange='changeResposta(${pID},this.value)' type='number' min='${fn[0]}' max='${fn[1]}' value=''>`
 		}
-		formText += `<option value=null> -- </option> ${options}</select><br>`
+		else {
+			formText += `<select id='pergunta_${pID}' onChange='changeResposta(${pID},this.value)'>`
+			let options = ''
+			for( let rID in respostas ) {
+				options += `<option value='${rID}'>${respostas[rID]}</option>`
+			}
+			formText += `<option value=null> -- </option> ${options}</select><br>`		
+		}
+
+		formText += `</div>`
+
 	}
 	formDiv.innerHTML = formText
 	if( formText.length > 0 ) cardPerguntas.style.display = 'flex'
@@ -185,21 +205,33 @@ function renderizarPerguntas() {
 
 
 
-function atualizarCardResultados() {
+function renderCardResultados() {
 	let resultadoObj = {}
 	let resultadoTexto = ''
-
+	console.log('\nANALISE DE RESULTADO')
 	// Itera a tabelaConclusao verificando os grupos de perguntas que
 	// foram respondidos de forma satisfazer as condicoes de conclusao
 	// e adiciona os objetivos e conclusoes no objeto resultadoObj
 	for( let cID in tabelaConclusao ) {
 		let conc = tabelaConclusao[cID]
+		console.log(`\nCONCLUSAO ${cID}: ${conc.conclusao_txt}`)
 		let grupoMatch = true
 		for( let gID in conc.grupos ) {
+			console.log(`\nGrupo ${gID}`)
 			grupoMatch = true
-			for( p in conc.grupos[gID] ) {
-				let perg = conc.grupos[gID][p]
-				if( perg.resposta_certa != perg.tabelaPerguntas.resposta_usuario ) {
+			for( pObj of conc.grupos[gID] ) {
+				//let pObj = conc.grupos[gID][pID]
+				let pID = pObj.pergunta_fk
+
+				// if( compFaixaNumeros.isFaixaDeNumero( pObj.row.resposta ) ) {
+				// 	console.log(`\nresposta certa é faixa de numero`)
+				// 	console.log('pObj:',pObj)
+				// }
+				console.log( pObj.row.pergunta, compFaixaNumeros.isFaixaDeNumero( pObj.row.resposta ) ? ' - (faixa)' : ' - (id)' )
+				let termo1 = pObj.tabelaPerguntas.resposta_usuario
+				let termo2 = pObj.resposta_certa 
+				let comparador = pObj.row.comparativo
+				if( !comparar( termo1, comparador, termo2 ) ) {
 					grupoMatch = false
 					break
 				}
@@ -229,6 +261,24 @@ function atualizarCardResultados() {
 // =========================================================================
 // FUNCOES DE PROCESSAMENTO
 // =========================================================================
+function comparar( termo1, comparador, termo2 ) {
+	if( !comparador ) comparador = '='
+	let rgx = /^(\s)*((!=)|=|>|<)(\s)*$/
+	comparador = rgx.test( comparador ) ? comparador : '='
+	comparador = comparador == '=' ? '==' : comparador
+	let stm = `${termo1} ${comparador} ${termo2}`
+	console.log({stm})
+	if( termo1 === null || termo1.length == 0 || termo2 === null || termo2.length == 0 ) {
+		console.log( false )
+		return false
+	} else {
+		let c = eval( stm )
+		console.log( c )
+		return c
+	}
+}
+
+
 async function fetchCondicoesUnrolled() {
 	let objetivosIDs = []
 	for( let opt of slcObjetivos.selectedOptions ) {
@@ -279,12 +329,18 @@ async function criarTabelas() {
 		tc.objetivo_id = con.objetivo_fk
 		tc.objetivo_txt = con.objetivo
 		if( !tc.grupos ) tc.grupos = {}
-		if( !tc.grupos[con.grupo] ) tc.grupos[con.grupo] = {}
+		if( !tc.grupos[con.grupo] ) tc.grupos[con.grupo] = []
 		g = tc.grupos[con.grupo]
-		g[`pergunta_${con.pergunta_fk}`] = {
-			resposta_certa: con.resposta_fk,
+		g.push({
+			pergunta_fk: con.pergunta_fk,
+		//g[`pergunta_${con.pergunta_fk}`] = {
+			row: con,
+			resposta_certa: compFaixaNumeros.isFaixaDeNumero( con.resposta ) ? con.valorDeFaixa : con.resposta_fk,
+			valorDeFaixa: con.valorDeFaixa,
+			comparator: con.comparativo,
 			tabelaPerguntas: tabelaPerguntas[con.pergunta_fk]
-		}
+		//}
+		})
 	}
 
 	return
@@ -292,9 +348,9 @@ async function criarTabelas() {
 
 
 
-function atualizarTabelaPerguntas( perguntaID,respostaID ) {
+function atualizarTabelaPerguntas( perguntaID,respostaUSR ) {
 	//alert(`${perguntaID} -  ${respostaID}`)
-	tabelaPerguntas[perguntaID].resposta_usuario = respostaID
+	tabelaPerguntas[perguntaID].resposta_usuario = respostaUSR
 }
 
 

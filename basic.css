@@ -170,3 +170,8 @@ button {
 	pointer-events: none;
 	opacity: .3;
 }
+
+#formDiv input,
+#formDiv select {
+	min-width:50%;
+}

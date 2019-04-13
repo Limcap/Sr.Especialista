@@ -234,8 +234,8 @@ ControllerSelectEdit.prototype._saveForm = async function() {
 	let DALDOB = {}
 	DALDOB[this.refs.fkColumn] = this.refs.fkValue
 	DALDOB[this.refs.textColumn] = newText
-	if( !isInsert ) DALDOB[this.refs.pkColumn] = DOB[this.refs.pkColumn]
-	console.log(JSON.stringify(DOB))
+	if( !isInsert ) DALDOB[this.refs.pkColumn] = selected.DOB[this.refs.pkColumn]
+	console.log(JSON.stringify(DALDOB))
 	
 	// ====== SALVA EXTERNAMENTE
 	let res = await this._saveExternal( DALDOB, this.refs.pkColumn )

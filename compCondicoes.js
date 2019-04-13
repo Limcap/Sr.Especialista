@@ -174,6 +174,7 @@ exports.adicionarCondicao = async function() {
 	let condicaoOpt  = this.view.slcBox.selectedOptions[0]
 	let grupo = condicaoOpt && condicaoOpt.DOB ? condicaoOpt.DOB.grupo : 0
 	let valorPadraoDeFaixa = respostaDOB ? compFaixaNumeros.getMin( respostaDOB.resposta ) : null
+	console.log({valorPadraoDeFaixa})
 
 	if( !objetivoDOB ) alert('Selecione um objetivo')
 	else if( !conclusaoDOB ) alert('Selecione uma conclusão')
@@ -216,7 +217,7 @@ exports.formatDOBtoDAL = function( DOB={}, mode='update' ) {
 		conclusao_fk: DOB.conclusao_fk || null,
 		resposta_fk: DOB.resposta_fk || null,
 		grupo: DOB.grupo || 0,
-		valorDeFaixa: DOB.valorDeFaixa || null,
+		valorDeFaixa: DOB.valorDeFaixa,
 		comparativo: DOB.comparativo || '='
 	}
 	if( mode == 'insert'){
@@ -336,29 +337,37 @@ exports.criarRenderArray = function( conclusaoID ) {
 
 
 exports.updateOptText = function( condicaoDOB ) {
+	/*
 	let cPerg = this.ctrl.perguntas.data.all
 	let cResp = this.ctrl.respostas.data.all
 
 	let pergunta = '' 
 	let resposta = ''
-	let comparativo = condicaoDOB.comparativo ? condicaoDOB.comparativo : '='
 
 	for( let i = 0; i < cPerg.length; i++ ) {
 		if( cPerg[i].id == condicaoDOB.pergunta_fk ) {
 			pergunta = cPerg[i].pergunta 
 		}
 	}
-
-	if( condicaoDOB.valorDeFaixa ) {
+	
+	let vf = condicaoDOB.valorDeFaixa
+	if( vf !== null && vf !== '' ) {
 		resposta = condicaoDOB.valorDeFaixa
-		
-	} else {
+	}
+	else {
 		for( let i = 0; i < cResp.length; i++ ) {
 			if( cResp[i].id == condicaoDOB.resposta_fk ) {
 				resposta = cResp[i].resposta 
 			}
 		}
 	}
+	*/
+	let comparativo = condicaoDOB.comparativo ? condicaoDOB.comparativo : '='
+
+	let pergunta = this.getPergunta( condicaoDOB )
+	let pTemp = pergunta.split('::')
+	pergunta = pTemp[0]
+	let resposta = this.getResposta( condicaoDOB )
 
 	condicaoDOB.opt.text = `${pergunta}   ${comparativo}   ${resposta}`
 }
@@ -424,7 +433,8 @@ exports.slcBoxChange = function( ev ) {
 exports.editCondicao = function() {
 	let v = this.view
 	let condicaoDOB = v.slcBox.selectedOptions[0].DOB
-	if( condicaoDOB != null && condicaoDOB.valorDeFaixa ) {
+	let n = condicaoDOB.valorDeFaixa
+	if( condicaoDOB != null && n !== null && n !== ''  ) {
 		v.grpRangeControls.classList.remove('disabledGroup')
 		console.log({condicaoDOB})
 		v.inpNumber.value = condicaoDOB.valorDeFaixa
@@ -437,7 +447,7 @@ exports.editCondicao = function() {
 	}
 }
 
-
+// ======================================= BUTTON TOOLS
 
 exports.btnEqualClick = function( ev ) {
 	ev.target.controller.setComparator('=')
@@ -456,11 +466,11 @@ exports.btnLargerClick = function( ev ) {
 }
 
 exports.inpNumberChange = function( ev ) {
-	ev.target.controller.checkMinMax( ev.target )
+	//ev.target.controller.checkMinMax( ev.target )
 }
 
 exports.inpNumberBlur = function( ev ) {
-	ev.target.controller.setRangeValue( ev.target.value )
+	ev.target.controller.setRangeValue( ev.target )
 }
 
 
@@ -479,18 +489,29 @@ exports.setComparator = async function( comparator ) {
 	this.updateOptText( opt.DOB )
 }
 
-exports.checkMinMax = function( elm ) {
-	if( elm.value < elm.min ) elm.value = elm.min
-	if( elm.value > elm.max ) elm.value = elm.max
-}
 
-exports.setRangeValue = async function( valor ) {
+
+exports.setRangeValue = function( elm ) {
+	elm.value = this.checkMinMax( elm )
+	let valor = elm.value
 	let opt = this.view.slcBox.selectedOptions[0]
 	if( opt && opt.DOB )
 		this.updateAndSaveDOB( opt.DOB, {valorDeFaixa:valor} ) 
 }
 
+
+exports.checkMinMax = function( elm ) {
+	console.log(elm.min, elm.value, elm.max)
+	if( parseInt(elm.value) < parseInt(elm.min) ) return elm.min
+	else if( parseInt(elm.value) > parseInt(elm.max) ) return elm.max
+	else return elm.value
+}
+
+
 exports.updateAndSaveDOB = async function( DOB, changes ) {
+	if( !compFaixaNumeros.isFaixaDeNumero( this.getRespostaField(DOB) ) ) {
+		DOB.valorDeFaixa = null
+	}
 	let DALDOB = this.formatDOBtoDAL( DOB,'update' )
 	this.updateDOB( DALDOB, changes )
 	let res = await this.persist.save( DALDOB,'condicoes','id' )
@@ -505,5 +526,47 @@ exports.updateDOB = function( DOB, changes ) {
 	console.log({DOB},{changes})
 	for( key in changes ) {
 		DOB[key] = changes[key]
+	}
+}
+
+
+/**
+ * GET TEXTO DOS FKs
+ */
+
+exports.getResposta = function( condicaoDOB ) {
+	let f = this.getRespostaField( condicaoDOB )
+	return compFaixaNumeros.isFaixaDeNumero( f ) ?
+		condicaoDOB.valorDeFaixa : f
+}
+
+exports.getRespostaField = function( condicaoDOB ) {
+	for(respostaDOB of this.ctrl.respostas.data.all) {
+		if( respostaDOB.id == condicaoDOB.resposta_fk )
+			return respostaDOB.resposta
+	}
+}
+
+exports.getPergunta = function( condicaoDOB ) {
+	for(perguntaDOB of this.ctrl.perguntas.data.all) {
+		if( perguntaDOB.id == condicaoDOB.pergunta_fk) {
+			return perguntaDOB.pergunta
+		}
+	}
+}
+
+exports.getObjetivo = function( condicaoDOB ) {
+	for(objetivoDOB of this.ctrl.objetivos.data.all) {
+		if( objetivoDOB.id == condicaoDOB.objetivo_fk) {
+			return objetivoDOB.objetivo
+		}
+	}
+}
+
+exports.getConclusao = function( condicaoDOB ) {
+	for(conclusaoDOB of this.ctrl.conclusaos.data.all) {
+		if( conclusaoDOB.id == condicaoDOB.conclusao_fk) {
+			return conclusaoDOB.conclusao
+		}
 	}
 }

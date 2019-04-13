@@ -31,8 +31,15 @@ exports.formatFaixaDeNumeros = function( text ) {
 
 
 exports.getRange = function( text ) {
+	console.log({text})
 	if( this.isFaixaDeNumero( text ) ) {
-		return text.replace(this.rule.cmd,'').split(this.rule.splitter)
+		console.log('faixa!',{text})
+		let tmp = text.replace(this.rule.cmd,'').split(this.rule.splitter)
+		console.log({tmp})
+		tmp[0] = parseInt(tmp[0])
+		tmp[1] = parseInt(tmp[1])
+		console.log({tmp})
+		return tmp
 	}
 	else return []
 }
