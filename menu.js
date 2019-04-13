@@ -18,11 +18,13 @@ const template = [
 					ipc.send('reload-dao')
 					delete require.cache[require.resolve('./controllerSelectEdit.js')];
 					setTimeout(()=>thisWin.reload(),1000)
-				}
+				},
+				accelerator: 'CmdOrCtrl+Shift+r'
 			},
 			{
 				label: 'Soft Reload',
-				click() { remote.getCurrentWindow().reload() }
+				click() { remote.getCurrentWindow().reload() },
+				accelerator: 'CmdOrCtrl+r'
 			}
 		]
 		
@@ -38,7 +40,10 @@ const template = [
 	{
 		label: 'Ajuda',
 		submenu: [
-			{ label: 'Como usar', click(){ipc.send('abrir-ajuda')} }
+			{
+				label: 'Como usar',
+				click(){ipc.send('abrir-ajuda')}
+			}
 		]
 	}
 ]
