@@ -1,7 +1,7 @@
 const fs = require('fs')
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3').verbose()
 const out = require('./out')
-
+const dbpath = './db.sqlite'
 
 // ---------- States
 let db
@@ -29,22 +29,30 @@ exports.getSistemaAtivo = function() {
  * Abre conexão com banco
  * Side effect: state "db"
  */
-exports.conectarDb = function() {
-	db = new sqlite3.Database('./db.sqlite', (err) => {
-		if (err) {
-		  console.error(err.message);
-		}
-		console.log('Connected to the database.');
-		console.log(db)
-	});
 
-	db.exec('PRAGMA foreign_keys = ON;', error => {
-		if (error){
-			 console.error("Pragma statement didn't work.")
-		} else {
-			 console.log("Foreign Key Enforcement is on.")
-		}
-	})
+exports.conectarDb = function() {
+	let dbMissing = !fs.existsSync(dbpath)
+	try {
+		db = new sqlite3.Database('./db.sqlite', (err) => {
+			if (err) {
+			console.error(err.message);
+			}
+			console.log('Connected to the database.');
+			console.log(db)
+		});
+		db.exec('PRAGMA foreign_keys = ON;', error => {
+			if (error){
+				console.error("Pragma statement didn't work.")
+			} else {
+				console.log("Foreign Key Enforcement is on.")
+			}
+		})
+		if(dbMissing)
+		throw("1::Não foi encontrada uma base de dados em em " + dbpath + ".\r\nUma nova será criada.")
+	}
+	catch(err){
+		throw(err)
+	}
 }
 
 
