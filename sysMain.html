@@ -76,6 +76,7 @@ const msgbox = require('./msgbox-front.js')
 // =========================================================================
 let tabelaConclusao = {}
 let tabelaPerguntas = {}
+let tabelaPropositos = {}
 
 
 
@@ -169,6 +170,8 @@ function clickBtFecharConsulta() {
 // =========================================================================
 function renderCardPerguntas() {
 	let formText = ''
+	
+
 	console.log(tabelaPerguntas)
 	for( let pID in tabelaPerguntas ) {
 		let pObj = tabelaPerguntas[pID]
@@ -176,9 +179,11 @@ function renderCardPerguntas() {
 		let pTemp = pTxt.split('::')
 		pTxt = pTemp.length > 1 ? pTemp[1] : pTemp[0]
 
-		let objetivosTexto = Object.values(pObj.objetivos).join('\n')
+		//let objetivosTexto = Object.values(pObj.objetivos).join('\n')
+		let objetivosTexto = "";
+		for( let i of tabelaPropositos[pID] ) objetivosTexto += (i + '\r\n')
 		formText += `<div class='pergunta'>${pTxt}`
-		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}' onClick='msgbox.showInfo(this.title)' style='cursor:pointer'> ( ? )</span>`
+		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar se:\n\n${objetivosTexto}' onClick='msgbox.showInfo(this.title)' style='cursor:pointer'> ( ? )</span>`
 		formText += `<br>`
 		
 		let respostas = pObj.respostas_possiveis
@@ -199,7 +204,6 @@ function renderCardPerguntas() {
 		}
 
 		formText += `</div>`
-
 	}
 	formDiv.innerHTML = formText
 	if( formText.length > 0 ) cardPerguntas.style.display = 'flex'
@@ -295,6 +299,7 @@ async function criarTabelas() {
 	const condicoesUnrolled = await fetchCondicoesUnrolled()
 	tabelaConclusao = {}
 	tabelaPerguntas = {}
+	tabelaPropositos = {}
 
 	// criando a o objeto tabela de perguntas
 	for( let con of condicoesUnrolled ) {
@@ -308,7 +313,13 @@ async function criarTabelas() {
 		tabelaPerguntas[con.pergunta_fk].pergunta_txt = con.pergunta
 		tabelaPerguntas[con.pergunta_fk].objetivos[con.objetivo_fk] = con.objetivo
 		tabelaPerguntas[con.pergunta_fk].respostas_possiveis[con.resposta_fk] = con.resposta
+
+		if(!tabelaPropositos[con.pergunta_fk]) tabelaPropositos[con.pergunta_fk]=[]
+		let txt = con.objetivo + " = " + con.conclusao
+		if(!tabelaPropositos[con.pergunta_fk].includes(txt)) tabelaPropositos[con.pergunta_fk].push(txt)
 	}
+
+
 
 	/*
 	// adiciona todas as respostas ao objeto tabela de perguntas

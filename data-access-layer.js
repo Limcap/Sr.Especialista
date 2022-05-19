@@ -306,3 +306,15 @@ exports.delDataObj = function( dataObj, tableName, pkColumn ) {
 		})
 	})
 }
+
+/*
+exports.GetQuestionPurposes = function( perguntaId ) {
+	return new Promise((resolve, reject)=>{
+		let qry = `SELECT pergunta, objetivo, conclusao FROM condicoes_unrolled WHERE pergunta_fk=${perguntaId}`
+		db.get( qry, [], (err, row) => {
+			if( err ) throw( err )
+			else resolve( row )
+		})
+	})
+}
+*/
