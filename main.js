@@ -1,29 +1,49 @@
 const { app, BrowserWindow } = require('electron')
 var dal = require('./data-access-layer')
 var out = require('./out')
-require("./msgbox-back.js")
-
-
-// ---------- CONECTAR BANCO DE DADOS
-dal.conectarDb()
+const msgbox = require("./msgbox-back.js")
+//const { showError: sendErrorAlertToWindow } = require('./msgbox-back.js')
 
 
 // ---------- INICIALIZAR JANELA
-let winMain
-function createWindow () {
-  winMain = new BrowserWindow({ width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
-  winMain.loadFile('sysLogin.html')
-  //win.webContents.openDevTools()
-}
-app.on('ready', createWindow)
-
+let winMain = null
 let winAjuda = null
+
+
+app.on('ready', ()=>{
+	let w = new BrowserWindow({ width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
+	winMain = w
+	w.loadFile('sysLogin.html')
+	//w.webContents.openDevTools()
+	w.webContents.on('did-finish-load', ()=>{
+		console.log("Carregamento da janela finalizado")
+		conectarDb()
+	})
+})
+
+
 function abrirAjuda() {
-	if( !winAjuda )
+	if( !winAjuda ) {
 		winAjuda = new BrowserWindow({width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
-	winAjuda.loadFile('sysAjuda.html')
-	winAjuda.on('closed', () => {winAjuda = null})
-	//winAjuda.setMenu(null)
+		winAjuda.loadFile('sysAjuda.html')
+		winAjuda.on('closed', () => {winAjuda = null})
+		//winAjuda.setMenu(null)
+	}
+}
+
+
+function conectarDb() {
+	try {
+		console.log("going to connect")
+		dal.conectarDb()
+	}
+	catch(err){
+		console.log(err)
+		err = err.split("::");
+		if(err[0]==1) msgbox.showWarning(winMain,err[1])
+		else msgbox.showError(winMain,err[0])
+		//winMain.webContents.send('error-back', err)
+	}
 }
 
 
@@ -34,7 +54,7 @@ ipc.on('reload-dao',function(ev, arg) {
 	let sysAtivo = dal.getSistemaAtivo()
 	delete require.cache[require.resolve('./data-access-layer.js')];
 	dal = require('./data-access-layer.js')
-	dal.conectarDb()
+	conectarDb()
 	dal.setPerfilAtivo(perfilAtivo)
 	dal.setSistemaAtivo(sysAtivo)
 })

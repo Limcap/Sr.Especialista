@@ -19,12 +19,34 @@ ipcMain.on("alert",(event,message)=>{
 // daí é só chamar a funcao usando msgbox.showMsg("mensagem")
 //depois, em todo lugar que fosse chamar um alert, ao inves disso chamamos:
 const { ipcRenderer } = require("electron");
+
+ipcRenderer.on('backend-log', function(event,msg) {
+    console.log(`message from backend:\r\n${msg}`);
+});
+
+ipcRenderer.on('backend-error', function(event,msg) {
+    console.log("Server error:\r\n" + msg);
+    ipcRenderer.send("error",msg)
+});
+
+ipcRenderer.on('backend-warning', function(event,msg) {
+    console.log("Server warning:\r\n" + msg);
+    ipcRenderer.send("warning",msg)
+});
+
+ipcRenderer.on('backend-info', function(event,msg) {
+    console.log("Server info:\r\n" + msg);
+    ipcRenderer.send("info",msg)
+});
+
 exports.showInfo = function(msg) {
     ipcRenderer.send("info",msg)
 }
+
 exports.showWarning = function(msg) {
     ipcRenderer.send("warning",msg)
 }
+
 exports.showError = function(msg) {
     ipcRenderer.send("error",msg)
 }
