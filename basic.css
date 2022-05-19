@@ -5,8 +5,11 @@
 }
 
 body {
-	background: url("./bgBlur.png") repeat fixed;
+	background: url("./bgBlurLight.png") repeat fixed;
+	/*
+	background: #eee;
 	background-size: 25px;
+	*/
 	margin: 1em 2em;
 }
 
