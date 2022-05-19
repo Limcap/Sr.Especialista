@@ -10,7 +10,7 @@ dal.conectarDb()
 // ---------- INICIALIZAR JANELA
 let winMain
 function createWindow () {
-  winMain = new BrowserWindow({ width: 800, height: 800 })
+  winMain = new BrowserWindow({ width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
   winMain.loadFile('sysLogin.html')
   //win.webContents.openDevTools()
 }
@@ -19,7 +19,7 @@ app.on('ready', createWindow)
 let winAjuda = null
 function abrirAjuda() {
 	if( !winAjuda )
-		winAjuda = new BrowserWindow({width: 800, height: 800})
+		winAjuda = new BrowserWindow({width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
 	winAjuda.loadFile('sysAjuda.html')
 	winAjuda.on('closed', () => {winAjuda = null})
 	//winAjuda.setMenu(null)
