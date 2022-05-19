@@ -11,7 +11,7 @@ let winAjuda = null
 
 
 app.on('ready', ()=>{
-	let w = new BrowserWindow({ width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
+	let w = new BrowserWindow({ width: 800, height: 800, title: "Sr. Especialista - Sobre", webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
 	winMain = w
 	w.loadFile('sysLogin.html')
 	//w.webContents.openDevTools()
@@ -24,7 +24,7 @@ app.on('ready', ()=>{
 
 function abrirAjuda() {
 	if( !winAjuda ) {
-		winAjuda = new BrowserWindow({width: 800, height: 800, webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
+		winAjuda = new BrowserWindow({width: 800, height: 800, title: "Sr. Especialista - Sobre", webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
 		winAjuda.loadFile('sysAjuda.html')
 		winAjuda.on('closed', () => {winAjuda = null})
 		//winAjuda.setMenu(null)
