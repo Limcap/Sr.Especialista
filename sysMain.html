@@ -193,7 +193,7 @@ function renderCardPerguntas() {
 			for( let rID in respostas ) {
 				options += `<option value='${rID}'>${respostas[rID]}</option>`
 			}
-			formText += `<option value=null> -- </option> ${options}</select><br>`		
+			formText += `<option value=null> -- </option>${options}</select><br>`
 		}
 
 		formText += `</div>`
@@ -244,7 +244,7 @@ function renderCardResultados() {
 	
 	// Itera o objeto resultadoObj jutando os valores na string resultadoTexto
 	for( objetivo in resultadoObj ) {
-		conclusao = resultadoObj[objetivo].join('\n')
+		conclusao = resultadoObj[objetivo].join('<br>')
 		if( conclusao.length == 0 ) conclusao = 'Inconclusivo'
 		resultadoTexto += `<br><p><b>${objetivo}:</b><br>${conclusao}</p>`
 	}
