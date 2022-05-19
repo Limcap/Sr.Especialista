@@ -3,19 +3,30 @@ const sqlite3 = require('sqlite3').verbose()
 const das = require('./data-access-state')
 const out = require('./out')
 
+// ---------- ATENÇÃO PARA O CAMINHO DO ARQUIVO DA BASE DE DADOS
+// Ao fazer o build do Electron, o arquivo db.sqlite vai estar na pasta 'resources/app', e o Electron
+// não deixa acessar arquivos lá e vai olhar na pasta raiz. Lembre-se de que ao compilar é necessário
+// mover manualmente o arquivo para a pasta raiz.
+const dbpath = 'db.sqlite' //'__dirname.slice(0,-3)'+'db.sqlite'
+
 // ---------- Functions
 /**
  * Abre conexão com banco
  * Side effect: state "db"
  */
 exports.conectarDb = function() {
-	das.db = new sqlite3.Database('./db.sqlite', (err) => {
-		if (err) {
-		  console.error(err.message);
-		}
-		out('Connected to the database.',0);
-		out(das.db)
-	});
+	if (!fs.existsSync(dbpath)) {
+		throw("A base de dados não existe em " + dbpath)
+	}
+	else {
+		das.db = new sqlite3.Database(dbpath, (err) => {
+			if (err) {
+			  console.error(err.message);
+			}
+			out('Connected to the database.',0);
+			out(das.db)
+		});
+	}
 }
 
 
@@ -65,6 +76,8 @@ exports.getSistemas = function() {
  * Side Effect: variável perfilAtivo
  **/
 exports.logar = function({login, senha}) {
+	alert(dbpath);
+	if (fs.existsSync(dbpath)) alert('db nao existe em ' + dbpath)
 	return new Promise((resolve, reject) => {
 		this.coincidirCredencial({login, senha})
 		.then((usuarioObj)=>{
