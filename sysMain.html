@@ -67,6 +67,7 @@ const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
 const compFaixaNumeros = require('./compFaixaNumeros')
 const out = remote.require('./out')
+const msgbox = require('./msgbox-front.js')
 
 
 
@@ -168,6 +169,7 @@ function clickBtFecharConsulta() {
 // =========================================================================
 function renderCardPerguntas() {
 	let formText = ''
+	console.log(tabelaPerguntas)
 	for( let pID in tabelaPerguntas ) {
 		let pObj = tabelaPerguntas[pID]
 		let pTxt = pObj.pergunta_txt
@@ -176,7 +178,7 @@ function renderCardPerguntas() {
 
 		let objetivosTexto = Object.values(pObj.objetivos).join('\n')
 		formText += `<div class='pergunta'>${pTxt}`
-		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}' onClick='alert(this.title)' style='cursor:pointer'> ( ? )</span>`
+		formText += `<span class='info-mark' title='Esta pergunta ajuda a determinar:\n${objetivosTexto}' onClick='msgbox.showInfo(this.title)' style='cursor:pointer'> ( ? )</span>`
 		formText += `<br>`
 		
 		let respostas = pObj.respostas_possiveis

@@ -60,7 +60,8 @@ const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
-
+const fs = require('fs')
+const msgbox = require("./msgbox-front.js");
 
 
 // =========================================================================
@@ -138,13 +139,14 @@ function isPerfilPublico() {
 }
 
 
-function tentarLogar() {
+async function tentarLogar() {
 	credenciais = {
 		login: inpLogin.value.trim(),
 		senha: inpSenha.value.trim()
 	}
-	dal.logar(credenciais)
-	.then(userObj =>{
+	try {
+		dal.logar(credenciais)
+		.then(userObj =>{
 		if(userObj) {
 			divMensagem.innerHTML=`Perfil encontrado: ${userObj.nome}`
 			thisWin.loadFile('./sysSelect.html')
@@ -152,6 +154,11 @@ function tentarLogar() {
 		else
 			divMensagem.innerHTML="Credencial não existente"
 	})
+	}
+	catch(err) {
+		fs.writeFileSync("./log.txt", err)
+		console.log(res)
+	}
 	/*
 	dal.coincidirUsuario(credenciais, (retorno) => {
 		if(!retorno) {
@@ -169,39 +176,49 @@ function tentarLogar() {
 
 async function salvarNovoPerfil() {
 	if( inpNome.value.length == 0 ) {
-		alert( 'Preencha o campo Nome' )
+		// alert( 'Preencha o campo Nome' )
+		msgbox.showWarning("Preencha o campo Nome")
+		inpNome.focus()
 	}
 	else if( inpSenha1.value.length == 0 ) {
-		alert( 'Preencha o campo Senha' )
+		//alert( 'Preencha o campo Senha' )
+		msgbox.showWarning('Preencha o campo Senha')
+		inpSenha1.focus()
 	}
 	else if( inpSenha1.value != inpSenha2.value ) {
-		alert( 'A confirmacao da senha nao é igual a senha' )
+		//alert( 'A confirmacao da senha nao é igual a senha' )
+		msgbox.showWarning('A confirmacao da senha nao é igual a senha')
+		inpSenha2.focus()
 	}
 	else {
 		let DOB = {
 			nome: inpNome.value,
 			senha: inpSenha1.value
 		}
-	
 		let res = await dal.saveDataObj( DOB, 'usuarios', 'id' )
 		if( res.err ) {
 			let msg = ''
+			require('fs').writeFile("/log.txt", res.err.error)
 			if( res.err.errno = 19 ) {
 				msg = 'Um perfil com esse mesmo nome já existe. Escolha um outro nome para o perfil'
 			}
 			else {
 				msg = res.err.error
 			}
-			alert( msg )
+			msgbox.showError(msg)
 		}
 		else {
-			alert( 'Perfil criardo!' )
+			//alert( 'Perfil criardo!' )
+			msgbox.showInfo(msg)
 			thisWin.reload()
 		}
 	}
+	/*
+	// Com o Electron, é necessário focar em um campo apos esta operação senão
+	// não conseguimos mais focar com o mouse em um campo fica impossível de digitar.
+	inpLogin.focus();
+	*/
 }
-
-
 
 </script>
 </html>

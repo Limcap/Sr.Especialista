@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 var dal = require('./data-access-layer')
 var out = require('./out')
+require("./msgbox-back.js")
 
 
 // ---------- CONECTAR BANCO DE DADOS

@@ -87,6 +87,7 @@ const { remote } = require('electron')
 const dal = remote.require('./data-access-layer.js')
 const thisWin = remote.getCurrentWindow()
 const menu = require('./menu.js')
+const msgbox = require('./msgbox-front.js')
 
 
 
@@ -238,7 +239,7 @@ function toggleCard( cardID, state=-1 ) {
 // =========================================================================
 async function salvarNovoSistema() {
 	if( inpTitulo.value.trim().length == 0 ) {
-		alert( 'Digite um nome para a nova especialidade' )
+		msgbox.showWarning( 'Digite um nome para a nova especialidade' )
 		return
 	}
 	let DOB = {
@@ -255,7 +256,7 @@ async function salvarNovoSistema() {
 		else {
 			msg = res.err.error
 		}
-		alert( msg )
+		msgbox.showError( msg )
 	}
 	else {
 		thisWin.reload()
@@ -277,7 +278,7 @@ async function deletarSistema() {
 			preencherSelectBoxSistemas()
 		}
 		else {
-			alert( res.err.error )
+			msgbox.showError( res.err.error )
 		}
 	}
 }
@@ -296,11 +297,11 @@ async function deletarPerfil() {
 		let res = await dal.delDataObj( dob, 'usuarios', 'id' )
 		console.log( res )
 		if( !res.err ) {
-			alert( `Este perfil foi apagado!. Retornaremos a tela de Login`)
+			msgbox.showError( `Este perfil foi apagado!. Retornaremos a tela de Login`)
 			sair()
 		}
 		else {
-			alert( res.err.error )
+			msgbox.showError(res.err.error )
 		}
 	}
 }
