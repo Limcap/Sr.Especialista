@@ -11,7 +11,7 @@ let winAjuda = null
 
 
 app.on('ready', ()=>{
-	let w = new BrowserWindow({ width: 800, height: 800, title: "Sr. Especialista - Sobre", webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
+	let w = new BrowserWindow({ width: 800, height: 800, title: "Sr. Especialista", webPreferences: {nodeIntegration: true,	contextIsolation: false, }})
 	winMain = w
 	w.loadFile('sysLogin.html')
 	//w.webContents.openDevTools()
